@@ -5,6 +5,7 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 
+
 object HelloWorld {
 	final case class Greet(whom: String, replyTo: ActorRef[Greeted])
 	final case class Greeted(whom: String, from: ActorRef[Greet])
@@ -35,7 +36,7 @@ object HelloWorldBot {
 		}
 }
 
-object HelloWorldMain {
+object HelloWorldMain extends App {
 
 	final case class SayHello(name: String)
 
@@ -50,9 +51,7 @@ object HelloWorldMain {
 			}
 		}
 
-	val system: ActorSystem[HelloWorldMain.SayHello] =
-		ActorSystem(HelloWorldMain(), "hello")
-
-	system ! HelloWorldMain.SayHello("World")
-	system ! HelloWorldMain.SayHello("Akka")
+	val system: ActorSystem[SayHello] = ActorSystem(HelloWorldMain(), "hello")
+	system ! SayHello("World")
 }
+
