@@ -8,6 +8,7 @@ organization := "be.unamur"
 
 libraryDependencies ++= {
 	Seq(
+		"com" % "phidget" % "22",
 		"com.typesafe.akka" %% "akka-actor-typed" % "2.9.6",
 		"com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.9.6" % Test,
 		"org.slf4j" % "slf4j-simple" % "2.0.16",
@@ -15,7 +16,9 @@ libraryDependencies ++= {
 	)
 }
 
-Compile / run / mainClass := Some("be.unamur.binny.HelloWorld")
-Compile / packageBin / mainClass := Some("be.unamur.binny.HelloWorld")
-resolvers ++= Seq("Akka library repository" at "https://repo.akka.io/maven")
+Compile / run / bgRun / packageBin / mainClass := Some("scala.be.unamur.binny.Binny")
+resolvers ++= Seq(
+				  "Akka library repository" at "https://repo.akka.io/maven",
+				  "ZeTioZ Repository" at "https://nexus.donatog.live/repository/maven-releases/"
+			  )
 scalacOptions ++= Seq("-unchecked", "-deprecation")
