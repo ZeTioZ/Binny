@@ -1,11 +1,11 @@
 package be.unamur.binny.actors
 
 import akka.actor.Actor
-import com.phidget22.{DistanceSensor, DistanceSensorDistanceChangeEvent, PhidgetException, VoltageRatioInput, VoltageRatioInputSensorChangeEvent, VoltageRatioInputSensorChangeListener, VoltageRatioSensorType}
+import com.phidget22.{PhidgetException, VoltageRatioInput, VoltageRatioInputSensorChangeEvent, VoltageRatioInputSensorChangeListener, VoltageRatioSensorType}
 
 class ForceSensorActor(channel: Int) extends Actor
 {
-	val forceSensor = new VoltageRatioInput()
+	private val forceSensor = new VoltageRatioInput()
 
 	override def preStart(): Unit = {
 		println("Démarrage du capteur de force...")

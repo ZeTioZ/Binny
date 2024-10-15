@@ -5,7 +5,7 @@ import com.phidget22.{DistanceSensor, DistanceSensorDistanceChangeEvent, Phidget
 
 class FootDistanceSensorActor(channel: Int) extends Actor
 {
-	val footDistanceSensor = new DistanceSensor()
+	private val footDistanceSensor = new DistanceSensor()
 
 	override def preStart(): Unit = {
 		println("Démarrage du capteur de distance de pieds...")
@@ -17,7 +17,7 @@ class FootDistanceSensorActor(channel: Int) extends Actor
 
 			footDistanceSensor.addDistanceChangeListener((event: DistanceSensorDistanceChangeEvent) => {
 				val distance: Double = event.getDistance
-				self ! LidDistanceReading(distance)
+				self ! FootDistanceReading(distance)
 			})
 		}
 		catch

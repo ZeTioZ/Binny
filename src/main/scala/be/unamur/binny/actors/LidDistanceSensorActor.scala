@@ -5,7 +5,7 @@ import com.phidget22.{DistanceSensor, DistanceSensorDistanceChangeEvent, Phidget
 
 class LidDistanceSensorActor(channel: Int) extends Actor
 {
-	val lidDistanceSensor = new DistanceSensor()
+	private val lidDistanceSensor = new DistanceSensor()
 
 	override def preStart(): Unit = {
 		println("Démarrage du capteur de distance de capot...")

@@ -1,9 +1,8 @@
 package be.unamur.binny.actors
 
-import akka.actor.{Actor, ActorSystem, Props}
-import com.phidget22.{Hub, Phidget, PhidgetException}
+import akka.actor.{Actor, Props}
+import com.phidget22.{Hub, PhidgetException}
 
-case class InitHub(hub: Hub)
 case object StartMonitoring
 case class LidDistanceReading(distance: Double)
 case class FootDistanceReading(distance: Double)
