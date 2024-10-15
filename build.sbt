@@ -16,7 +16,7 @@ libraryDependencies ++= {
 	)
 }
 
-Compile / run / bgRun / packageBin / mainClass := Some("scala.be.unamur.binny.Binny")
+Compile / run / bgRun / packageBin / mainClass := Some("be.unamur.binny.Binny")
 resolvers ++= Seq(
 				  "Akka library repository" at "https://repo.akka.io/maven",
 				  "ZeTioZ Repository" at "https://nexus.donatog.live/repository/maven-releases/"
