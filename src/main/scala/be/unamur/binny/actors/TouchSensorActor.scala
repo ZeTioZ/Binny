@@ -5,7 +5,9 @@ import com.phidget22.{PhidgetException, VoltageRatioInput, VoltageRatioInputSens
 
 class TouchSensorActor(channel: Int) extends Actor
 {
+	private case class TouchReading(touched: Double)
 	private val touchSensor = new VoltageRatioInput()
+	private var touched: Double = 0.0
 
 	override def preStart(): Unit = {
 		println("Démarrage du capteur de touché...")
@@ -19,8 +21,9 @@ class TouchSensorActor(channel: Int) extends Actor
 			println("Capteur de touché connecté")
 
 			touchSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
-				val touched: Double = event.getSensorValue
-				self ! TouchReading(touched)
+				if (event.getSensorValue != touched)
+					touched = event.getSensorValue
+					self ! TouchReading(touched)
 			})
 		}
 		catch

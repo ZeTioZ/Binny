@@ -4,10 +4,6 @@ import akka.actor.{Actor, Props}
 import com.phidget22.{Hub, PhidgetException}
 
 case object StartMonitoring
-case class LidDistanceReading(distance: Double)
-case class FootDistanceReading(distance: Double)
-case class ForceReading(force: Double)
-case class TouchReading(touched: Double)
 
 class PhidgetHub(hub: Hub) extends Actor
 {
@@ -39,6 +35,7 @@ class PhidgetHub(hub: Hub) extends Actor
 			val lidDistanceSensorActor = context.actorOf(Props(new LidDistanceSensorActor(0)), "lidDistanceSensorActor")
 			val forceSensorActor = context.actorOf(Props(new ForceSensorActor(1)), "forceSensorActor")
 			val touchSensorActor = context.actorOf(Props(new TouchSensorActor(2)), "touchSensorActor")
+
 		case other => println(s"Message inconnu: $other")
 	}
 }

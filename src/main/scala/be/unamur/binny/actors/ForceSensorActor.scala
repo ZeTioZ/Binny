@@ -5,7 +5,9 @@ import com.phidget22.{PhidgetException, VoltageRatioInput, VoltageRatioInputSens
 
 class ForceSensorActor(channel: Int) extends Actor
 {
+	private case class ForceReading(force: Double)
 	private val forceSensor = new VoltageRatioInput()
+	private var force: Double = 0.0
 
 	override def preStart(): Unit = {
 		println("Démarrage du capteur de force...")
@@ -19,8 +21,11 @@ class ForceSensorActor(channel: Int) extends Actor
 			println("Capteur de force connecté")
 
 			forceSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
-				val force: Double = event.getSensorValue
-				self ! ForceReading(force)
+				if (event.getSensorValue != force && Math.abs(event.getSensorValue - force) > 0.01)
+				{
+					force = event.getSensorValue
+					self ! ForceReading(force)
+				}
 			})
 		}
 		catch
@@ -34,7 +39,7 @@ class ForceSensorActor(channel: Int) extends Actor
 
 	override def receive: Receive = {
 		case ForceReading(force) =>
-			println(s"Force: $force")
+			println(s"Lecture du capteur de force: $force")
 	}
 
 	override def postStop(): Unit = {

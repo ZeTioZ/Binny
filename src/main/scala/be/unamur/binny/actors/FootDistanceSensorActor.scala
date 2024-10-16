@@ -5,6 +5,7 @@ import com.phidget22.{DistanceSensor, DistanceSensorDistanceChangeEvent, Phidget
 
 class FootDistanceSensorActor(channel: Int) extends Actor
 {
+	private case class FootDistanceReading(distance: Double)
 	private val footDistanceSensor = new DistanceSensor()
 
 	override def preStart(): Unit = {
