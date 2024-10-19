@@ -6,13 +6,16 @@ scalaVersion := "3.5.1"
 
 organization := "be.unamur"
 
+val AkkaVersion = "2.10.0"
 libraryDependencies ++= {
 	Seq(
 		"com" % "phidget" % "22",
-		"com.typesafe.akka" %% "akka-actor-typed" % "2.9.6",
-		"com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.9.6" % Test,
+		"com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
+		"com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test,
 		"org.slf4j" % "slf4j-simple" % "2.0.16",
-		"org.slf4j" % "slf4j-api" % "2.0.16",
+		"com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
+		"com.typesafe.akka" %% "akka-http" % "10.7.0",
+		"com.typesafe.akka" %% "akka-stream" % AkkaVersion,
 	)
 }
 
