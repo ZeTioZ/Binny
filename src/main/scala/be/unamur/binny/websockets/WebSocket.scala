@@ -11,7 +11,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Directives.{handleWebSocketMessages, path}
 import akka.http.scaladsl.server.Route
 
-object WebSocket
+class WebSocket extends Thread
 {
 	implicit val system: ActorSystem = ActorSystem("binny-websocket")
 	implicit val executionContext: ExecutionContextExecutor  = system.dispatcher
@@ -20,8 +20,12 @@ object WebSocket
 	private def messageHandler: Flow[Message, Message, Any] =
 		Flow[Message].map {
 			case textMessage: TextMessage.Strict =>
-				// Retourne le texte inversé au client
-				TextMessage.Strict(s"Echo: ${textMessage.text}")
+				textMessage.text match {
+					case "Hello" =>
+						TextMessage.Strict("Hello, World!")
+					case _ =>
+						TextMessage.Strict("Message inconnu")
+				}
 			case _: Message =>
 				TextMessage.Strict("Message non supporté")
 		}
@@ -32,16 +36,18 @@ object WebSocket
 			handleWebSocketMessages(messageHandler)
 		}
 
-	// Démarrer le serveur HTTP
-	private val bindingFuture: Future[ServerBinding] = Http().newServerAt("localhost", 8080).bind(route)
+	override def run(): Unit = {
+		// Démarrer le serveur HTTP
+		val bindingFuture: Future[ServerBinding] = Http().newServerAt("localhost", 8080).bind(route)
 
-	println("Serveur WebSocket démarré sur ws://localhost:8080/ws")
-	println("Appuyez sur ENTER pour arrêter le serveur...")
+		println("Serveur WebSocket démarré sur ws://localhost:8080/ws")
+		println("Appuyez sur ENTER pour arrêter le serveur...")
 
-	StdIn.readLine() // Attendre une entrée pour arrêter le serveur
+		StdIn.readLine() // Attendre une entrée pour arrêter le serveur
 
-	// Arrêter le serveur
-	bindingFuture
-		.flatMap(_.unbind())
-		.onComplete(_ => system.terminate())
+		// Arrêter le serveur
+		bindingFuture
+			.flatMap(_.unbind())
+			.onComplete(_ => system.terminate())
+	}
 }
