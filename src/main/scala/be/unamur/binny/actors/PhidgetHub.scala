@@ -35,6 +35,7 @@ class PhidgetHub(hub: Hub) extends Actor
 			val lidDistanceSensorActor = context.actorOf(Props(new LidDistanceSensorActor(0)), "lidDistanceSensorActor")
 			val forceSensorActor = context.actorOf(Props(new ForceSensorActor(1)), "forceSensorActor")
 			val touchSensorActor = context.actorOf(Props(new TouchSensorActor(2)), "touchSensorActor")
+			val footDistanceSensorActor = context.actorOf(Props(new FootDistanceSensorActor(3)), "footDistanceSensorActor")
 
 		case other => println(s"Message inconnu: $other")
 	}
