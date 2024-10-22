@@ -1,7 +1,7 @@
 package be.unamur.binny.actors
 
 import akka.actor.Actor
-import com.phidget22.{PhidgetException, VoltageRatioInput, VoltageRatioInputSensorChangeEvent, VoltageRatioInputSensorChangeListener, VoltageRatioSensorType}
+import com.phidget22.{PhidgetException, VoltageRatioInput, VoltageRatioInputSensorChangeEvent, VoltageRatioSensorType}
 
 class ForceSensorActor(channel: Int) extends Actor
 {
