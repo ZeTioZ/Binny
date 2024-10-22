@@ -1,29 +1,24 @@
 package be.unamur.binny.actors
 
 import akka.actor.Actor
-import com.phidget22.{PhidgetException, VoltageRatioInput, VoltageRatioInputSensorChangeEvent, VoltageRatioSensorType}
+import com.phidget22.{DistanceSensor, DistanceSensorDistanceChangeEvent, PhidgetException}
 
 class LidDistanceSensorActor(channel: Int) extends Actor
 {
-	private case class IRReading(touched: Double)
-	private val irReading = new VoltageRatioInput()
-	private var distance: Double = 0.0
+	private case class LidDistanceReading(distance: Double)
+	private val lidDistanceSensor = new DistanceSensor()
 
 	override def preStart(): Unit = {
-		println("Démarrage du capteur de touché...")
+		println("Démarrage du capteur de distance...")
 		try
 		{
-			irReading.setIsHubPortDevice(true)
-			irReading.setHubPort(channel)
-			irReading.setDeviceSerialNumber(672221)
-			irReading.open(5000)
-			irReading.setSensorType(VoltageRatioSensorType.PN_1103)
-			println("Capteur infrarouge connecté")
+			lidDistanceSensor.setHubPort(channel)
+			lidDistanceSensor.open(5000)
+			println("Capteur de distance connecté")
 
-			irReading.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
-				if (event.getSensorValue != distance)
-					distance = event.getSensorValue
-					self ! IRReading(distance)
+			lidDistanceSensor.addDistanceChangeListener((event: DistanceSensorDistanceChangeEvent) => {
+				val distance: Double = event.getDistance
+				self ! LidDistanceReading(distance)
 			})
 		}
 		catch
@@ -36,12 +31,12 @@ class LidDistanceSensorActor(channel: Int) extends Actor
 	}
 
 	override def receive: Receive = {
-		case IRReading(distance) =>
+		case LidDistanceReading(distance) =>
 			println(s"Distance: $distance")
 	}
 
 	override def postStop(): Unit = {
-		println("Capteur infrarouge déconnecté")
-		irReading.close()
+		println("Capteur de distance déconnecté")
+		lidDistanceSensor.close()
 	}
 }
