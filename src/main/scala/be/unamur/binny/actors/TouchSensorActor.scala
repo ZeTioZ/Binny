@@ -10,7 +10,7 @@ class TouchSensorActor(channel: Int) extends Actor
 	private var touched: Double = 0.0
 
 	override def preStart(): Unit = {
-		println("Démarrage du capteur de touché...")
+		println("Démarrage du capteur de toucher...")
 		try
 		{
 			touchSensor.setIsHubPortDevice(true)
@@ -18,7 +18,7 @@ class TouchSensorActor(channel: Int) extends Actor
 			touchSensor.setDeviceSerialNumber(672221)
 			touchSensor.open(5000)
 			touchSensor.setSensorType(VoltageRatioSensorType.PN_1129)
-			println("Capteur de touché connecté")
+			println("Capteur de toucher connecté")
 
 			touchSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
 				if (event.getSensorValue != touched)
@@ -29,9 +29,9 @@ class TouchSensorActor(channel: Int) extends Actor
 		catch
 		{
 			case e: PhidgetException =>
-				println(s"Erreur lors de la connexion au capteur de distance: ${e.getMessage}")
+				println(s"Erreur lors de la connexion au capteur de toucher: ${e.getMessage}")
 				self ! preStart()
-			case _ => println("Erreur inconnue lors de la connexion au capteur de distance")
+			case _ => println("Erreur inconnue lors de la connexion au capteur de toucher")
 		}
 	}
 
@@ -42,7 +42,7 @@ class TouchSensorActor(channel: Int) extends Actor
 	}
 
 	override def postStop(): Unit = {
-		println("Capteur de force déconnecté")
+		println("Capteur de toucher déconnecté")
 		touchSensor.close()
 	}
 }
