@@ -32,10 +32,10 @@ class PhidgetHub(hub: Hub) extends Actor
 	def receive: Receive = {
 		case StartMonitoring =>
 			println("Démarrage de la surveillance des capteurs")
-			val lidDistanceSensorActor = context.actorOf(Props(new LidDistanceSensorActor(0)), "lidDistanceSensorActor")
+			val footDistanceSensorActor = context.actorOf(Props(new FootDistanceSensorActor(0)), "footDistanceSensorActor")
 			val forceSensorActor = context.actorOf(Props(new ForceSensorActor(1)), "forceSensorActor")
 			val touchSensorActor = context.actorOf(Props(new TouchSensorActor(2)), "touchSensorActor")
-			val footDistanceSensorActor = context.actorOf(Props(new FootDistanceSensorActor(3)), "footDistanceSensorActor")
+			val lidDistanceSensorActor = context.actorOf(Props(new LidDistanceSensorActor(3)), "lidDistanceSensorActor")
 
 		case other => println(s"Message inconnu: $other")
 	}
