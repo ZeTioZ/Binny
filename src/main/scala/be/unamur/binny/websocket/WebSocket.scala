@@ -1,4 +1,4 @@
-package be.unamur.binny.websockets
+package be.unamur.binny.websocket
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http

@@ -2,7 +2,7 @@ package be.unamur.binny
 
 import akka.actor.{ActorSystem, Props}
 import be.unamur.binny.actors.PhidgetHub
-import be.unamur.binny.websockets.WebSocket
+import be.unamur.binny.websocket.WebSocket
 import com.phidget22.Hub
 
 
