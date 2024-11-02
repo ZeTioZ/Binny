@@ -10,3 +10,4 @@ target/
 project/
 .vscode/
 .metals/
+venv/
