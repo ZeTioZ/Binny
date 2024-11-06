@@ -12,12 +12,12 @@ import scalafx.Includes.*
 
 class VirtualAssistantEyes extends JFXApp3 {
 
-	val eyeRadius = 45.0   // Taille des yeux
-	val pupilRadius = 15.0 // Taille des pupilles
-	val movementRange = 9.5  // Limite de déplacement des pupilles
+	private val eyeRadius: Float = 45.0   // Taille des yeux
+	private val pupilRadius: Float = 15.0 // Taille des pupilles
+	private val movementRange: Float = 9.5  // Limite de déplacement des pupilles
 
 	// Création des yeux (les grands cercles blancs)
-	val leftEye = new Circle {
+	private val leftEye: Circle = new Circle {
 		centerX = 150
 		centerY = 100
 		radius = eyeRadius
@@ -26,7 +26,7 @@ class VirtualAssistantEyes extends JFXApp3 {
 		strokeWidth = 2
 	}
 
-	val rightEye = new Circle {
+	private val rightEye: Circle = new Circle {
 		centerX = 250
 		centerY = 100
 		radius = eyeRadius
@@ -36,14 +36,14 @@ class VirtualAssistantEyes extends JFXApp3 {
 	}
 
 	// Création des pupilles (les petits cercles noirs)
-	val leftPupil = new Circle {
+	private val leftPupil: Circle = new Circle {
 		centerX = leftEye.centerX()
 		centerY = leftEye.centerY()
 		radius = pupilRadius
 		fill = Color.Black
 	}
 
-	val rightPupil = new Circle {
+	private val rightPupil: Circle = new Circle {
 		centerX = rightEye.centerX()
 		centerY = rightEye.centerY()
 		radius = pupilRadius
@@ -51,7 +51,7 @@ class VirtualAssistantEyes extends JFXApp3 {
 	}
 
 	// Animation qui déplace les pupilles de gauche à droite
-	val eyeMovementTimeline = new Timeline {
+	private val eyeMovementTimeline: Timeline = new Timeline {
 		cycleCount = Timeline.Indefinite
 		keyFrames = Seq(
 			KeyFrame(Duration(0), onFinished = _ => {
