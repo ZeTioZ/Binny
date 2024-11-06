@@ -1,5 +1,6 @@
-import requests
 import json
+import requests
+
 
 def send_request(message):
 	url = "http://26.22.108.117:1234/v1/chat/completions"
@@ -28,6 +29,7 @@ def send_request(message):
 		return response.json()
 	else:
 		return {"error": "Request failed with status code " + str(response.status_code)}
+
 
 def main():
 	print("Welcome to the Chatbot! Type 'quit' to exit.")

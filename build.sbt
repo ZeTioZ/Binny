@@ -16,6 +16,7 @@ libraryDependencies ++= {
 		"com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
 		"com.typesafe.akka" %% "akka-http" % "10.7.0",
 		"com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+		"org.scalafx" %% "scalafx" % "22.0.0-R33"
 	)
 }
 
