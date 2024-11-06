@@ -12,14 +12,14 @@ import scalafx.Includes.*
 
 class VirtualAssistantEyes extends JFXApp3 {
 
-	private val eyeRadius: Float = 45.0   // Taille des yeux
-	private val pupilRadius: Float = 15.0 // Taille des pupilles
-	private val movementRange: Float = 9.5  // Limite de déplacement des pupilles
+	private val eyeRadius: Float = 70.0   // Taille des yeux
+	private val pupilRadius: Float = 35.0 // Taille des pupilles
+	private val movementRange: Float = 15  // Limite de déplacement des pupilles
 
 	// Création des yeux (les grands cercles blancs)
 	private val leftEye: Circle = new Circle {
 		centerX = 150
-		centerY = 100
+		centerY = 160
 		radius = eyeRadius
 		fill = Color.White
 		stroke = Color.Black
@@ -27,8 +27,8 @@ class VirtualAssistantEyes extends JFXApp3 {
 	}
 
 	private val rightEye: Circle = new Circle {
-		centerX = 250
-		centerY = 100
+		centerX = 330
+		centerY = 160
 		radius = eyeRadius
 		fill = Color.White
 		stroke = Color.Black
@@ -75,7 +75,7 @@ class VirtualAssistantEyes extends JFXApp3 {
 
 		stage = new PrimaryStage {
 			title = "Virtual Assistant Eyes Animation"
-			scene = new Scene(400, 200) {
+			scene = new Scene(480, 320) {
 				content = List(leftEye, rightEye, leftPupil, rightPupil)
 				fill = Color.LightBlue
 			}
