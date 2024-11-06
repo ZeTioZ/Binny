@@ -6,9 +6,9 @@ import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
-
 import scalafx.util.Duration
 import scalafx.Includes.*
+import scalafx.scene.image.Image
 
 class VirtualAssistantEyes extends JFXApp3 {
 
@@ -78,6 +78,7 @@ class VirtualAssistantEyes extends JFXApp3 {
 			scene = new Scene(480, 320) {
 				content = List(leftEye, rightEye, leftPupil, rightPupil)
 				fill = Color.LightBlue
+				cursor = scalafx.scene.Cursor.None
 			}
 			fullScreen = true
 		}
