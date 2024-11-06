@@ -79,6 +79,7 @@ class VirtualAssistantEyes extends JFXApp3 {
 				content = List(leftEye, rightEye, leftPupil, rightPupil)
 				fill = Color.LightBlue
 			}
+			fullScreen = true
 		}
 	}
 }
