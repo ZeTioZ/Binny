@@ -7,3 +7,5 @@ unidecode
 inflect
 phonemizer
 flask
+speechrecognition
+playsound

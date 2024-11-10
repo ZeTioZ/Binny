@@ -6,6 +6,7 @@ import torch
 from utils.tools import prepare_text
 from scipy.io.wavfile import write
 import time
+from playsound import playsound
 		
 print("\033[1;94mINFO:\033[;97m Initializing TTS Engine...")
 
@@ -82,7 +83,7 @@ if __name__ == "__main__":
 	@app.route('/synthesize/', defaults={'text': ''})
 	@app.route('/synthesize/<path:text>')
 	def synthesize(text):
-		if(text == ''): return 'No input'
+		if text == '': return 'No input'
 		
 		line = urllib.parse.unquote(request.url[request.url.find('synthesize/')+11:])
 		filename = "GLaDOS-tts-"+line.replace(" ", "-")
@@ -92,27 +93,27 @@ if __name__ == "__main__":
 		file = os.getcwd()+'/audio/'+filename
 		
 		# Check for Local Cache
-		if(os.path.isfile(file)):
+		if os.path.isfile(file):
 		
 			# Update access time. This will allow for routine cleanups
 			os.utime(file, None)
 			print("\033[1;94mINFO:\033[;97m The audio sample sent from cache.")
-			return send_file(file)
+			playsound(file)
+			return 'TTS Engine Success'
 			
 		# Generate New Sample
 		key = str(time.time())[7:]
-		if(glados_tts(line, key)):
+		if glados_tts(line, key):
 			tempfile = os.getcwd()+'/audio/GLaDOS-tts-temp-output-'+key+'.wav'
 						
 			# If the line isn't too long, store in cache
-			if(len(line) < 200 and CACHE):
+			if len(line) < 200 and CACHE:
 				shutil.move(tempfile, file)
+				playsound(file)
 			else:
-				return send_file(tempfile)
+				playsound(tempfile)
 				os.remove(tempfile)
-				
-			return send_file(file)
-				
+			return 'TTS Engine Success'
 		else:
 			return 'TTS Engine Failed'
 			
