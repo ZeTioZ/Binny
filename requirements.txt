@@ -1,3 +1,9 @@
 asyncio
 websockets
 requests
+torch
+scipy
+unidecode
+inflect
+phonemizer
+flask

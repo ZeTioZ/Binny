@@ -7,8 +7,6 @@ import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 import scalafx.util.Duration
-import scalafx.Includes.*
-import scalafx.scene.image.Image
 
 class VirtualAssistantEyes extends JFXApp3 {
 
