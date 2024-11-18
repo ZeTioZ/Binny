@@ -1,12 +1,14 @@
 package be.unamur.binny.animation
 
-import scalafx.animation.{KeyFrame, Timeline}
+import scalafx.animation.{KeyFrame, ScaleTransition, Timeline, TranslateTransition}
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 import scalafx.util.Duration
+
+import scala.util.Random
 
 class VirtualAssistantEyes extends JFXApp3 {
 
@@ -67,9 +69,30 @@ class VirtualAssistantEyes extends JFXApp3 {
 		)
 	}
 
+	// Animation qui déplace les pupilles de gauche à droite
+	private val leftPupilTransition: TranslateTransition = new TranslateTransition {
+		duration = Duration(1000)
+		node = leftPupil
+		fromX = -movementRange
+		toX = movementRange
+		autoReverse = true
+		cycleCount = TranslateTransition.Indefinite
+	}
+
+	private val rightPupilTransition: TranslateTransition = new TranslateTransition {
+		duration = Duration(1000)
+		node = rightPupil
+		fromX = -movementRange
+		toX = movementRange
+		autoReverse = true
+		cycleCount = TranslateTransition.Indefinite
+	}
+
 	override def start(): Unit = {
 		// Démarrage de l'animation au lancement
-		eyeMovementTimeline.play()
+//		eyeMovementTimeline.play() // En mode teleportation
+		leftPupilTransition.play()
+		rightPupilTransition.play()
 
 		stage = new PrimaryStage {
 			title = "Virtual Assistant Eyes Animation"

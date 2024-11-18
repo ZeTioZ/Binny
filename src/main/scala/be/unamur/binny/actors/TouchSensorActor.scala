@@ -38,6 +38,7 @@ class TouchSensorActor(channel: Int) extends Actor
 	override def receive: Receive = {
 		case TouchReading(touched) =>
 			val isTouched = touched > 0.5
+			context.parent ! TouchedUpdate(isTouched)
 			println(s"Touched: $isTouched")
 	}
 

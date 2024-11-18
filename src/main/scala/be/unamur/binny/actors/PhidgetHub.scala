@@ -1,13 +1,19 @@
 package be.unamur.binny.actors
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorRef, Props}
+import be.unamur.binny.SharedState
 import com.phidget22.{Hub, PhidgetException}
 
-case object StartMonitoring
+private case object StartMonitoring
+private case class DistanceUpdate(distance: Double)
+private case class TouchedUpdate(touched: Boolean)
+private case class LidOpenUpdate(lid: Boolean)
+private case class NearUpdate(near: Boolean)
 
-class PhidgetHub(hub: Hub) extends Actor
+class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) extends Actor
 {
-	override def preStart(): Unit = {
+	override def preStart(): Unit =
+	{
 		// Ouvrir la connexion avec le hub
 		try
 		{
@@ -24,19 +30,70 @@ class PhidgetHub(hub: Hub) extends Actor
 		}
 	}
 
-	override def postStop(): Unit = {
+	override def postStop(): Unit =
+	{
 		hub.close() // Fermer la connexion au hub quand l'acteur est arrêté
 		println("Hub déconnecté")
 	}
 
-	def receive: Receive = {
+	def receive: Receive =
+	{
 		case StartMonitoring =>
 			println("Démarrage de la surveillance des capteurs")
 			val footDistanceSensorActor = context.actorOf(Props(new FootDistanceSensorActor(0)), "footDistanceSensorActor")
 			val forceSensorActor = context.actorOf(Props(new ForceSensorActor(1)), "forceSensorActor")
 			val touchSensorActor = context.actorOf(Props(new TouchSensorActor(2)), "touchSensorActor")
 			val lidDistanceSensorActor = context.actorOf(Props(new LidDistanceSensorActor(3)), "lidDistanceSensorActor")
-
+		case DistanceUpdate(distance) => sharedState.lidDistance = distance
+		case TouchedUpdate(touched) =>
+			sharedState.isTouched = touched
+			toggleLidOnTouch()
+		case LidOpenUpdate(lid) => sharedState.isLidOpen = lid
+		case NearUpdate(near) =>
+			sharedState.isNear = near
+			toggleLidOnNear()
 		case other => println(s"Message inconnu: $other")
+	}
+
+	private def toggleLidOnNear(): Unit =
+	{
+		try
+		{
+			if (sharedState.isLidOpen)
+			{
+				servoMotor.tell(setAngle(0), self)
+			}
+			else
+			{
+				servoMotor.tell(setAngle(90), self)
+			}
+		}
+		catch
+		{
+			case e: PhidgetException => println(s"Erreur lors de la modification de l'état de la sortie: ${e.getMessage}")
+			case _ => println("Erreur inconnue lors de la modification de l'état de la sortie")
+		}
+	}
+	private def toggleLidOnTouch(): Unit =
+	{
+		try
+		{
+			if (sharedState.isTouched)
+			{
+				if (sharedState.isLidOpen)
+				{
+					servoMotor.tell(setAngle(0), self)
+				}
+				else
+				{
+					servoMotor.tell(setAngle(90), self)
+				}
+			}
+		}
+		catch
+		{
+			case e: PhidgetException => println(s"Erreur lors de la modification de l'état de la sortie: ${e.getMessage}")
+			case _ => println("Erreur inconnue lors de la modification de l'état de la sortie")
+		}
 	}
 }

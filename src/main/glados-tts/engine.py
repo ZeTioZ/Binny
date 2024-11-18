@@ -109,7 +109,7 @@ if __name__ == "__main__":
 			# If the line isn't too long, store in cache
 			if len(line) < 200 and CACHE:
 				shutil.move(tempfile, file)
-				playsound(file)
+				playsound(tempfile)
 			else:
 				playsound(tempfile)
 				os.remove(tempfile)

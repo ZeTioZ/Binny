@@ -7,6 +7,7 @@ class LidDistanceSensorActor(channel: Int) extends Actor
 {
 	private case class LidDistanceReading(distance: Double)
 	private val lidDistanceSensor = new DistanceSensor()
+	private var lastDistance: Double = 0.0
 
 	override def preStart(): Unit = {
 		println("Démarrage du capteur de distance...")
@@ -18,7 +19,10 @@ class LidDistanceSensorActor(channel: Int) extends Actor
 
 			lidDistanceSensor.addDistanceChangeListener((event: DistanceSensorDistanceChangeEvent) => {
 				val distance: Double = event.getDistance
-				self ! LidDistanceReading(distance)
+				if (distance != lastDistance && Math.abs(distance - lastDistance) > 2) {
+					lastDistance = distance
+					self ! LidDistanceReading(distance)
+				}
 			})
 		}
 		catch
@@ -33,6 +37,7 @@ class LidDistanceSensorActor(channel: Int) extends Actor
 	override def receive: Receive = {
 		case LidDistanceReading(distance) =>
 			println(s"Distance: $distance")
+			context.parent ! DistanceUpdate(distance)
 	}
 
 	override def postStop(): Unit = {

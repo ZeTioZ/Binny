@@ -37,7 +37,10 @@ class FootDistanceSensorActor(channel: Int) extends Actor
 
 	override def receive: Receive = {
 		case IRReading(distance) =>
-			println(s"Distance: $distance")
+			val isNear = distance > 0.5
+			println(s"Is Near: $isNear")
+			context.parent ! NearUpdate(isNear)
+
 	}
 
 	override def postStop(): Unit = {
