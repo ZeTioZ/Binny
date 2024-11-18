@@ -72,10 +72,9 @@ if __name__ == "__main__":
 	PORT = 8124
 	CACHE = True
 
-	from flask import Flask, request, send_file
+	from flask import Flask, request
 	import urllib.parse
-	import shutil
-	
+
 	print("\033[1;94mINFO:\033[;97m Initializing TTS Server...")
 	
 	app = Flask(__name__)
@@ -84,35 +83,13 @@ if __name__ == "__main__":
 	@app.route('/synthesize/<path:text>')
 	def synthesize(text):
 		if text == '': return 'No input'
-		
 		line = urllib.parse.unquote(request.url[request.url.find('synthesize/')+11:])
-		filename = "GLaDOS-tts-"+line.replace(" ", "-")
-		filename = filename.replace("!", "")
-		filename = filename.replace("°c", "degrees celcius")
-		filename = filename.replace(",", "")+".wav"
-		file = os.getcwd()+'/audio/'+filename
-		
-		# Check for Local Cache
-		if os.path.isfile(file):
-		
-			# Update access time. This will allow for routine cleanups
-			os.utime(file, None)
-			print("\033[1;94mINFO:\033[;97m The audio sample sent from cache.")
-			playsound(file)
-			return 'TTS Engine Success'
-			
 		# Generate New Sample
 		key = str(time.time())[7:]
 		if glados_tts(line, key):
 			tempfile = os.getcwd()+'/audio/GLaDOS-tts-temp-output-'+key+'.wav'
-						
-			# If the line isn't too long, store in cache
-			if len(line) < 200 and CACHE:
-				shutil.move(tempfile, file)
-				playsound(tempfile)
-			else:
-				playsound(tempfile)
-				os.remove(tempfile)
+			playsound(tempfile)
+			os.remove(tempfile)
 			return 'TTS Engine Success'
 		else:
 			return 'TTS Engine Failed'
