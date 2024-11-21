@@ -51,14 +51,14 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 			println("Démarrage du moteur")
 			servo.setTargetPosition(0)
 			servo.setEngaged(true)
-			self ! ServoUpdate(0)
+//			self ! ServoUpdate(0)
 			scheduleDisengage()
 
 		case setAngle(angle) =>
 			println(s"Réglage de l'angle du moteur à $angle")
 			servo.setTargetPosition(angle)
 			servo.setEngaged(true)
-			self ! ServoUpdate(angle)
+//			self ! ServoUpdate(angle)
 			scheduleDisengage()
 
 		case DisengageMotor =>
