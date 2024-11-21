@@ -80,7 +80,7 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 	{
 		for (scheduled <- scheduledEngage) yield scheduled.cancel(false)
 		scheduledEngage = Some(scheduler.schedule(new Runnable {
-			override def run(): Unit = self ! StartMotor
+			override def run(): Unit = self ! EngageMotor
 		}, 1000, TimeUnit.MILLISECONDS))
 	}
 
