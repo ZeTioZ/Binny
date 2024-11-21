@@ -7,6 +7,7 @@ import com.phidget22.{PhidgetException, RCServo}
 import java.util.concurrent.{Executors, ScheduledFuture, TimeUnit}
 
 private case object StartMotor
+private case object EngageMotor
 private case object DisengageMotor
 private case class setAngle(angle: Double)
 private case class ServoUpdate(angle: Double)
@@ -15,6 +16,7 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 {
 	private val scheduler = Executors.newScheduledThreadPool(1)
 	private var scheduledDisengage: Option[ScheduledFuture[?]] = None
+	private var scheduledEngage: Option[ScheduledFuture[?]] = None
 
 	override def preStart(): Unit =
 	{
@@ -50,16 +52,20 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 		case StartMotor =>
 			println("Démarrage du moteur")
 			servo.setTargetPosition(0)
-			servo.setEngaged(true)
+			scheduleEngage()
 			self ! ServoUpdate(0)
 			scheduleDisengage()
 
 		case setAngle(angle) =>
 			println(s"Réglage de l'angle du moteur à $angle")
 			servo.setTargetPosition(angle)
-//			servo.setEngaged(true)
+			scheduleEngage()
 			self ! ServoUpdate(angle)
 			scheduleDisengage()
+
+		case EngageMotor =>
+			println("Engagement du moteur")
+			servo.setEngaged(true)
 
 		case DisengageMotor =>
 			println("Désengagement du moteur")
@@ -70,11 +76,19 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 		case other => println(s"Message inconnu: $other")
 	}
 
+	private def scheduleEngage(): Unit =
+	{
+		for (scheduled <- scheduledEngage) yield scheduled.cancel(false)
+		scheduledEngage = Some(scheduler.schedule(new Runnable {
+			override def run(): Unit = self ! StartMotor
+		}, 1000, TimeUnit.MILLISECONDS))
+	}
+
 	private def scheduleDisengage(): Unit =
 	{
 		for (scheduled <- scheduledDisengage) yield scheduled.cancel(false)
 		scheduledDisengage = Some(scheduler.schedule(new Runnable {
 			override def run(): Unit = self ! DisengageMotor
-		}, 1500, TimeUnit.MILLISECONDS))
+		}, 2500, TimeUnit.MILLISECONDS))
 	}
 }
