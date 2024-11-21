@@ -21,7 +21,11 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 		try
 		{
 			servo.setDeviceSerialNumber(307756)
-			servo.open(5000)
+			while(!servo.getIsOpen)
+			{
+				println("Ouverture du moteur...")
+				servo.open(5000)
+			}
 			println("Servo moteur connecté")
 			self ! StartMotor
 		}
@@ -51,7 +55,7 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 			scheduleDisengage()
 
 		case setAngle(angle) =>
-			// Sometimes, the servo seems to be disconnected, so we try to reconnect it
+			println(s"Réglage de l'angle du moteur à $angle")
 			servo.setTargetPosition(angle)
 			servo.setEngaged(true)
 			self ! ServoUpdate(angle)
