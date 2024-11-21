@@ -11,4 +11,4 @@ project/
 .vscode/
 .metals/
 venv/
-src/main/glados-tts/audio/*
+src/main/glados-tts/audio/
