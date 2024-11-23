@@ -2,8 +2,8 @@ import re
 from typing import Dict, Any
 
 from phonemizer.phonemize import phonemize
-from utils.numbers import normalize_numbers
-from utils.symbols import phonemes_set
+from .numbers import normalize_numbers
+from .symbols import phonemes_set
 from unidecode import unidecode
 
 # Regular expression matching whitespace:

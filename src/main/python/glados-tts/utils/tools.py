@@ -1,7 +1,7 @@
 import torch
 
-from utils.cleaners import Cleaner
-from utils.tokenizer import Tokenizer
+from .cleaners import Cleaner
+from .tokenizer import Tokenizer
 
 def prepare_text(text: str)->str:
     if not ((text[-1] == '.') or (text[-1] == '?') or (text[-1] == '!')):

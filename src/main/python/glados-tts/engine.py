@@ -3,11 +3,11 @@ import os
 sys.path.insert(0, os.getcwd()+'/glados_tts')
 
 import torch
+import requests
 from utils.tools import prepare_text
 from scipy.io.wavfile import write
 import time
-from playsound import playsound
-		
+
 print("\033[1;94mINFO:\033[;97m Initializing TTS Engine...")
 
 # Select the device
@@ -49,14 +49,11 @@ def glados_tts(text, key=False):
 		audio = vocoder(mel)
 		print("\033[1;94mINFO:\033[;97m The audio sample took " + str(round((time.time() - old_time) * 1000)) + " ms to generate.")
 
-		# Normalize audio to fit in wav-file
+		# Normalize audio to fit in a wav-file
 		audio = audio.squeeze()
 		audio = audio * 32768.0
 		audio = audio.cpu().numpy().astype('int16')
-		if(key):
-			output_file = ('audio/GLaDOS-tts-temp-output-'+key+'.wav')
-		else:
-			output_file = ('audio/GLaDOS-tts-temp-output.wav')
+		output_file = 'audio/GLaDOS-tts-temp-output.wav'
 
 		# Write audio file to disk
 		# 22,05 kHz sample rate 
@@ -65,12 +62,17 @@ def glados_tts(text, key=False):
 	return True
 
 
-# If the script is run directly, assume remote engine
+def post_sound(sound_file):
+	url = 'http://127.0.0.1:8000/upload'
+	with open(sound_file, 'rb') as file:
+		resp = requests.post(url=url, files={'file': file})
+		print(resp.json().get('message'))
+
+
+# If the script is run directly, assume a remote engine
 if __name__ == "__main__":
-	
-	# Remote Engine Veritables
+	# Remote Engine Variables
 	PORT = 8124
-	CACHE = True
 
 	from flask import Flask, request
 	import urllib.parse
@@ -85,10 +87,11 @@ if __name__ == "__main__":
 		if text == '': return 'No input'
 		line = urllib.parse.unquote(request.url[request.url.find('synthesize/')+11:])
 		# Generate New Sample
-		key = str(time.time())[7:]
-		if glados_tts(line, key):
-			tempfile = os.getcwd()+'/audio/GLaDOS-tts-temp-output-'+key+'.wav'
-			playsound(tempfile)
+		if glados_tts(line):
+			tempfile = os.getcwd()+'/audio/GLaDOS-tts-temp-output.wav'
+			print("\033[1;94mINFO:\033[;97m Sending sound to REST API...")
+			print("\033[1;94mINFO:\033[;97m Sound file: " + tempfile)
+			post_sound(tempfile)
 			os.remove(tempfile)
 			return 'TTS Engine Success'
 		else:

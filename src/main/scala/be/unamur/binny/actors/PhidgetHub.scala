@@ -59,13 +59,18 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 	{
 		try
 		{
-			if (sharedState.isLidOpen)
+			if (sharedState.isNear)
 			{
-				servoMotor.tell(setAngle(0), self)
-			}
-			else
-			{
-				servoMotor.tell(setAngle(90), self)
+				if (sharedState.isLidOpen)
+				{
+					servoMotor.tell(setAngle(0), self)
+					sharedState.servoAngle = 0
+				}
+				else
+				{
+					servoMotor.tell(setAngle(90), self)
+					sharedState.servoAngle = 90
+				}
 			}
 		}
 		catch
@@ -83,10 +88,12 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 				if (sharedState.isLidOpen)
 				{
 					servoMotor.tell(setAngle(0), self)
+					sharedState.servoAngle = 0
 				}
 				else
 				{
 					servoMotor.tell(setAngle(90), self)
+					sharedState.servoAngle = 90
 				}
 			}
 		}

@@ -9,3 +9,6 @@ phonemizer
 flask
 speechrecognition
 playsound
+fastapi
+uvicorn
+python-multipart
