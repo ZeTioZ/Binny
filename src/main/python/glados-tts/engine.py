@@ -20,8 +20,8 @@ else:
 
 # Load models
 if __name__ == "__main__":
-	glados = torch.jit.load('models/glados.pt')
-	vocoder = torch.jit.load('models/vocoder-gpu.pt', map_location=device)
+	glados = torch.jit.load('./models/glados.pt')
+	vocoder = torch.jit.load('./models/vocoder-gpu.pt', map_location=device)
 else:
 	glados = torch.jit.load('glados_tts/models/glados.pt')
 	vocoder = torch.jit.load('glados_tts/models/vocoder-gpu.pt', map_location=device)
@@ -53,7 +53,7 @@ def glados_tts(text, key=False):
 		audio = audio.squeeze()
 		audio = audio * 32768.0
 		audio = audio.cpu().numpy().astype('int16')
-		output_file = 'audio/GLaDOS-tts-temp-output.wav'
+		output_file = './audio/GLaDOS-tts-temp-output.wav'
 
 		# Write audio file to disk
 		# 22,05 kHz sample rate 
