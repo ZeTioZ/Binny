@@ -23,6 +23,14 @@ class WebSocket extends Thread
 				textMessage.text match {
 					case "Hello" =>
 						TextMessage.Strict("Hello, World!")
+					case "color:blue" =>
+						TextMessage.Strict("Opening blue trash bin")
+					case "color:black" =>
+						TextMessage.Strict("Opening black trash bin")
+					case "color:green" =>
+						TextMessage.Strict("Opening green trash bin")
+					case "color:None" =>
+						TextMessage.Strict("None color detected")
 					case _ =>
 						TextMessage.Strict("Message inconnu")
 				}
