@@ -18,6 +18,7 @@ def playsound(sound_path: str):
 	                channels=wf.getnchannels(),
 	                rate=wf.getframerate(),
 	                output=True,
+	                output_device_index = 1,
 	                stream_callback=callback)
 	# start the stream
 	stream.start_stream()
