@@ -38,9 +38,9 @@ class WebSocket extends Thread
 
 	override def run(): Unit = {
 		// Démarrer le serveur HTTP
-		val bindingFuture: Future[ServerBinding] = Http().newServerAt("0.0.0.0", 8080).bind(route)
+		val bindingFuture: Future[ServerBinding] = Http().newServerAt("0.0.0.0", 25000).bind(route)
 
-		println("Serveur WebSocket démarré sur ws://0.0.0.0:8080/ws")
+		println("Serveur WebSocket démarré sur ws://0.0.0.0:25000/ws")
 		println("Appuyez sur ENTER pour arrêter le serveur...")
 
 		StdIn.readLine() // Attendre une entrée pour arrêter le serveur
