@@ -11,4 +11,3 @@ speechrecognition
 fastapi
 uvicorn
 python-multipart
-pyaudio
