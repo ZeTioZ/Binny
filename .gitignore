@@ -12,3 +12,4 @@ project/
 .metals/
 venv/
 src/main/python/glados-tts/audio/
+.*/__pycache__/
