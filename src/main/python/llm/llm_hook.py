@@ -6,7 +6,7 @@ import re
 
 from src.main.python.websocket import websocket
 
-llm_url = "http://26.22.108.117:1234/v1/chat/completions"
+llm_url = "http://127.0.0.1:1234/v1/chat/completions"
 synthesizer_url = "http://127.0.0.1:8124/synthesize/"
 
 
