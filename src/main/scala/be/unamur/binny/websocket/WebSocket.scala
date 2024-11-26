@@ -1,6 +1,6 @@
 package be.unamur.binny.websocket
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.Flow
@@ -11,7 +11,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Directives.{handleWebSocketMessages, path}
 import akka.http.scaladsl.server.Route
 
-class WebSocket extends Thread
+class WebSocket(hub: ActorRef) extends Thread
 {
 	implicit val system: ActorSystem = ActorSystem("binny-websocket")
 	implicit val executionContext: ExecutionContextExecutor  = system.dispatcher
@@ -24,10 +24,14 @@ class WebSocket extends Thread
 					case "Hello" =>
 						TextMessage.Strict("Hello, World!")
 					case "color:blue" =>
+						// Envoyer un message à l'acteur PhidgetHub pour ouvrir la poubelle bleue
+						hub ! "open:blue"
 						TextMessage.Strict("Opening blue trash bin")
 					case "color:black" =>
+						hub ! "open:black"
 						TextMessage.Strict("Opening black trash bin")
 					case "color:green" =>
+						hub ! "open:green"
 						TextMessage.Strict("Opening green trash bin")
 					case "color:None" =>
 						TextMessage.Strict("None color detected")

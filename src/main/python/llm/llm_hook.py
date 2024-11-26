@@ -1,7 +1,10 @@
+import asyncio
 import json
 import requests
 import speech_recognition as sr
 import re
+
+from src.main.python.websocket import websocket
 
 llm_url = "http://26.22.108.117:1234/v1/chat/completions"
 synthesizer_url = "http://127.0.0.1:8124/synthesize/"
@@ -51,9 +54,13 @@ def stt_to_tts():
 			for color in colors:
 				sanitize = sanitize.replace(color, "")
 			print(sanitize)
-			print(colors[0] if len(colors) > 0 else "None")
+			bag_color = colors[0].replace(" ", "").replace("bag:", "") if len(colors) > 0 else "None"
+			print(bag_color)
 			response = requests.get(f"{synthesizer_url}{sanitize}")
 			print(response)
+			# Send the response to the websocket.
+			asyncio.run(websocket.send_ws_message("127.0.0.1:25000", f'color:{bag_color}'))
+
 	except sr.RequestError as e:
 		print("Could not request results; {0}".format(e))
 	except sr.UnknownValueError:

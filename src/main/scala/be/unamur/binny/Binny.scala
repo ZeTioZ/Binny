@@ -16,7 +16,7 @@ object Binny extends JFXApp3
 	private val servo: RCServo = new RCServo()
 	private val servoMotor: ActorRef = system.actorOf(Props(new ServoMotor(sharedState, servo)), "servoMotor")
 	private val phidgetHub: ActorRef = system.actorOf(Props(new PhidgetHub(sharedState, hub, servoMotor)), "phidgetHub")
-	val webSocket: Unit = new WebSocket().start()
+	val webSocket: Unit = new WebSocket(phidgetHub).start()
 
 	override def start(): Unit = {
 		new VirtualAssistantEyes().start()

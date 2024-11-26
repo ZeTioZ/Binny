@@ -49,21 +49,46 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 	{
 		case StartMotor =>
 			println("Démarrage du moteur")
-			servo.setTargetPosition(0)
-			servo.setEngaged(true)
-			self ! ServoUpdate(0)
-			scheduleDisengage()
-
+			try
+			{
+				self ! setAngle(0)
+			}
+			catch
+			{
+				case e: PhidgetException =>
+					println(s"Erreur lors du démarrage du moteur: ${e.getMessage}")
+				case ex =>
+					println(s"Erreur inconnue lors du désengagement du moteur ${ex.getMessage}")
+			}
 		case setAngle(angle) =>
-			println(s"Réglage de l'angle du moteur à $angle")
-			servo.setTargetPosition(angle)
-			servo.setEngaged(true)
-			self ! ServoUpdate(angle)
-			scheduleDisengage()
-
+			try
+			{
+				println(s"Réglage de l'angle du moteur à $angle")
+				servo.setTargetPosition(angle)
+				servo.setEngaged(true)
+				self ! ServoUpdate(angle)
+				scheduleDisengage()
+			}
+			catch
+			{
+				case e: PhidgetException =>
+					println(s"Erreur lors du réglage de l'angle du moteur: ${e.getMessage}")
+				case ex =>
+					println(s"Erreur inconnue lors du désengagement du moteur ${ex.getMessage}")
+			}
 		case DisengageMotor =>
-			println("Désengagement du moteur")
-			servo.setEngaged(false)
+			try
+			{
+				println("Désengagement du moteur")
+				servo.setEngaged(false)
+			}
+			catch
+			{
+				case e: PhidgetException =>
+					println(s"Erreur lors du désengagement du moteur: ${e.getMessage}")
+				case ex =>
+					println(s"Erreur inconnue lors du désengagement du moteur ${ex.getMessage}")
+			}
 
 		case ServoUpdate(angle) => sharedState.servoAngle = angle
 
@@ -71,10 +96,10 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 	}
 
 	private def scheduleDisengage(): Unit =
-	{
+	synchronized {
 		for (scheduled <- scheduledDisengage) yield scheduled.cancel(false)
 		scheduledDisengage = Some(scheduler.schedule(new Runnable {
 			override def run(): Unit = self ! DisengageMotor
-		}, 1500, TimeUnit.MILLISECONDS))
+		}, 500, TimeUnit.MILLISECONDS))
 	}
 }
