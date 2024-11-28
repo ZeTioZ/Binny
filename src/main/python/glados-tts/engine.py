@@ -66,7 +66,7 @@ def post_sound(sound_file):
 	url = 'http://127.0.0.1:8000/upload'
 	with open(sound_file, 'rb') as file:
 		resp = requests.post(url=url, files={'file': file})
-		print(resp.json().get('message'))
+		print("\033[1;94mINFO:\033[;97m Response from REST API:" + resp.json().get('message'))
 
 
 # If the script is run directly, assume a remote engine

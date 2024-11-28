@@ -33,8 +33,8 @@ async def root():
 	return response
 
 
-@app.post("/upload")
-async def upload(file: Optional[UploadFile] = File(None)):
+@app.post("/upload_sound")
+async def upload_sound(file: Optional[UploadFile] = File(None)):
 	if not os.path.exists(uploads_path):
 		os.mkdir(uploads_path)
 	try:
@@ -51,4 +51,19 @@ async def upload(file: Optional[UploadFile] = File(None)):
 		return JSONResponse(content={"message": f"There was an error playing the file(s)!\n{error}"}, status_code=500)
 	finally:
 		os.remove(f"{uploads_path}{file.filename}")
+	return JSONResponse(content={"message": f"Successfully uploaded {file.filename}!"}, status_code=200)
+
+
+@app.post("/upload_image")
+async def upload_image(file: Optional[UploadFile] = File(None)):
+	if not os.path.exists(uploads_path):
+		os.mkdir(uploads_path)
+	try:
+		print(f"{uploads_path}{file.filename}")
+		with open(f"{uploads_path}{file.filename}", 'wb') as f:
+			shutil.copyfileobj(file.file, f)
+	except FileNotFoundError as error:
+		return JSONResponse(content={"message": f"There was an error uploading the file(s)!\n{error}"}, status_code=500)
+	finally:
+		file.file.close()
 	return JSONResponse(content={"message": f"Successfully uploaded {file.filename}!"}, status_code=200)
