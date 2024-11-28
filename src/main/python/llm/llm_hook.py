@@ -4,7 +4,7 @@ import requests
 import speech_recognition as sr
 import re
 
-from src.main.python.websocket import websocket
+import websocket
 
 llm_url = "http://127.0.0.1:1234/v1/chat/completions"
 synthesizer_url = "http://127.0.0.1:8124/synthesize/"
@@ -44,8 +44,8 @@ def stt_to_tts():
 			try:
 				response = send_request(user_input)
 				bot_response = response.get("choices")[0].get("message").get("content") if response.get("choices") else "Sorry, I did not understand what you said."
-			except requests.exceptions.ConnectionError:
-				bot_response = "Sorry, there is a network related issue."
+			except requests.exceptions.ConnectionError as e:
+				bot_response = "Sorry, there is a network related issue: {0}".format(e)
 			# Send the response to the synthesizer.
 			sanitize = bot_response.replace("\n", " ").replace("\r", "").replace("\t", "").replace("\\", "")
 			pattern = re.compile(r"(bag: *(?:blue|green|black|none))", re.IGNORECASE)
@@ -63,8 +63,8 @@ def stt_to_tts():
 
 	except sr.RequestError as e:
 		print("Could not request results; {0}".format(e))
-	except sr.UnknownValueError:
-		print("Unknown error occurred")
+	except sr.UnknownValueError as e:
+		print("Unknown error occurred {0}".format(e))
 
 
 if __name__ == "__main__":

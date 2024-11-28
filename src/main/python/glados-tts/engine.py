@@ -33,7 +33,7 @@ for i in range(4):
 	init_vo = vocoder(init_mel)
 
 
-def glados_tts(text, key=False):
+def glados_tts(text):
 
 	# Tokenize, clean and phonemize input text
 	x = prepare_text(text).to('cpu')
