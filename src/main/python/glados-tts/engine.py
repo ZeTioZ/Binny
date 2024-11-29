@@ -63,10 +63,10 @@ def glados_tts(text):
 
 
 def post_sound(sound_file):
-	url = 'http://127.0.0.1:8000/upload'
+	url = 'http://127.0.0.1:8000/upload_sound'
 	with open(sound_file, 'rb') as file:
 		resp = requests.post(url=url, files={'file': file})
-		print("\033[1;94mINFO:\033[;97m Response from REST API:" + resp.json().get('message'))
+		print("\033[1;94mINFO:\033[;97m Response from REST API:" + (resp.json().get('message') if resp is not None else 'Failed'))
 
 
 # If the script is run directly, assume a remote engine
@@ -87,7 +87,8 @@ if __name__ == "__main__":
 		if text == '': return 'No input'
 		line = urllib.parse.unquote(request.url[request.url.find('synthesize/')+11:])
 		# Generate New Sample
-		if glados_tts(line):
+		print("\033[1;94mINFO:\033[;97m Generating new sample from text: " + line)
+		if glados_tts(line.replace('+', ' ')):
 			tempfile = os.getcwd()+'/audio/GLaDOS-tts-temp-output.wav'
 			print("\033[1;94mINFO:\033[;97m Sending sound to REST API...")
 			print("\033[1;94mINFO:\033[;97m Sound file: " + tempfile)
