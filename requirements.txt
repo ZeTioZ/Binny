@@ -11,3 +11,5 @@ speechrecognition
 fastapi
 uvicorn
 python-multipart
+ultralytics
+opencv-python

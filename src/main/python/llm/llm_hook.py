@@ -6,9 +6,12 @@ import re
 import aiohttp
 import websocket
 import threading
+import cv2
 
+cap = cv2.VideoCapture(0)
 llm_url = "http://127.0.0.1:1234/v1/chat/completions"
-synthesizer_url = "http://127.0.0.1:8124/synthesize/"
+synthesizer_url = "http://127.0.0.1:8124/synthesize"
+rest_api_url = "http://127.0.0.1:8000"
 current_task = None
 
 
@@ -49,15 +52,15 @@ def process_command(user_input):
 	for color in colors:
 		sanitize = sanitize.replace(color, "")
 	bag_color = colors[0].replace(" ", "").replace("bag:", "") if len(colors) > 0 else "None"
-	asyncio.run(websocket.send_ws_message("10.8.0.10:25000", f'color:{bag_color}'))
+	asyncio.run(websocket.send_ws_message("10.8.0.2:25000", f'color:{bag_color}'))
 	print(sanitize)
-	response = asyncio.run(fetch_synthesizer_response(f"{synthesizer_url}{sanitize}"))
+	response = asyncio.run(fetch_synthesizer_response(f"{synthesizer_url}/{sanitize}"))
 	print(response)
 
 
 async def stt_to_tts():
 	global current_task
-	keyword_variants = ["hey binny", "hey benny", "hey beanies", "hey ben", "hey benn", "hey beanie", "ebony"]
+	keyword_variants = ["hey binny", "hey benny", "hey beanies", "hey ben", "hey benn", "hey beanie", "ebony", "hey baby", "baby", "hey binnie", "hey bin", "hey binn"]
 	recognizer = sr.Recognizer()
 	try:
 		with sr.Microphone() as source2:
@@ -70,13 +73,18 @@ async def stt_to_tts():
 					print(user_input)
 					if user_input.lower() in keyword_variants:
 						print("Keyword detected. Listening for command...")
-						requests.get(url="http://127.0.0.1:8000/stop_sound")
+						requests.get(url=f"{rest_api_url}/stop_sound")
 						if current_task is not None:
 							current_task.join()
 							current_task = None
-						current_task = await fetch_synthesizer_response(f"{synthesizer_url}Hey%2C%20what%20can%20I%20do%20for%20you%3F")
-						audio2 = recognizer.listen(source2)
-						user_input = recognizer.recognize_google(audio2)
+						current_task = await fetch_synthesizer_response(f"{synthesizer_url}/Hey%2C%20what%20can%20I%20do%20for%20you%3F")
+						ret, frame = cap.read() if cap.isOpened() else (False, None)
+						image_response = await post_image(frame) if frame is not None else None
+						if image_response is not None and image_response.message in ['e-waste', 'general_waste', 'glass', 'metal', 'organic_waste', 'paper', 'plastic']:
+							user_input = f"As you can see, I have a {image_response.message} object to throw away. Where should I put it?"
+						else:
+							audio2 = recognizer.listen(source2)
+							user_input = recognizer.recognize_google(audio2)
 						print(user_input)
 						current_task = threading.Thread(target=process_command, args=(user_input,))
 						current_task.start()
@@ -88,6 +96,14 @@ async def stt_to_tts():
 		print("Could not request results; {0}".format(e))
 	except sr.UnknownValueError as e:
 		print("Unknown error occurred {0}".format(e))
+
+
+async def post_image(image_file):
+	url = f'{rest_api_url}/upload_image'
+	with open(image_file, 'rb') as file:
+		resp = requests.post(url=url, files={'file': file})
+		print("\033[1;94mINFO:\033[;97m Response from REST API:" + (resp.json().get('message') if resp is not None else 'Failed'))
+	return resp
 
 if __name__ == "__main__":
 	asyncio.run(stt_to_tts())

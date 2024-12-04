@@ -8,10 +8,13 @@ from typing import Optional
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from ..utils.playsound import PlaySound
+from .utils.playsound import PlaySound
+from ..image_classification.utils.model_loader import ModelLoader
+from ..image_classification.utils.yolov11_converter_utils import convert_image_box_outputs
 
 app = FastAPI()
 audio = PlaySound()
+model = ModelLoader("..\\src\\main\\python\\image_classification\\models\\binny11m.pt")
 
 
 # CORS settings (see https://fastapi.tiangolo.com/tutorial/cors)
@@ -70,8 +73,20 @@ async def upload_image(file: Optional[UploadFile] = File(None)):
 		print(f"{uploads_path}{file.filename}")
 		with open(f"{uploads_path}{file.filename}", 'wb') as f:
 			shutil.copyfileobj(file.file, f)
+		predictions = model.predict(f"{uploads_path}{file.filename}")
+		print(predictions[0].names)
+		boxes = convert_image_box_outputs(predictions)
+		best_cls = boxes[0].cls if len(boxes) > 0 else "None"
+		best_conf = boxes[0].conf if len(boxes) > 0 else 0
+		for box in boxes:
+			if box.conf > best_conf:
+				best_cls = box.cls
+				best_conf = box.conf
+		os.remove(f"{uploads_path}{file.filename}")
+		if best_conf < 0.5 or best_cls == "None":
+			return JSONResponse(content={"message": f"Could not detect any objects in the image!"}, status_code=200)
+		return JSONResponse(content={"message": best_cls}, status_code=200)
 	except FileNotFoundError as error:
 		return JSONResponse(content={"message": f"There was an error uploading the file(s)!\n{error}"}, status_code=500)
 	finally:
 		file.file.close()
-	return JSONResponse(content={"message": f"Successfully uploaded {file.filename}!"}, status_code=200)
