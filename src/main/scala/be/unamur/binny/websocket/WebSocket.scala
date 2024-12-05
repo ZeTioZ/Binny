@@ -33,7 +33,7 @@ class WebSocket(hub: ActorRef) extends Thread
 					case "color:green" =>
 						hub ! "open:green"
 						TextMessage.Strict("Opening green trash bin")
-					case "color:None" =>
+					case "color:none" =>
 						TextMessage.Strict("None color detected")
 					case _ =>
 						TextMessage.Strict("Message inconnu")

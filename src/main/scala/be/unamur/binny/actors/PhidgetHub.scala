@@ -128,33 +128,33 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 			color match
 			{
 				case "blue" =>
-					if (sharedState.isLidFree && sharedState.servoAngle == 0)
+					if (sharedState.isLidFree && sharedState.servoAngle == 90)
 					{
 						println("Ouverture de la poubelle bleue")
-						servoMotor.tell(setAngle(90), self)
-						sharedState.servoAngle = 90
+						servoMotor.tell(setAngle(0), self)
+						sharedState.servoAngle = 0
 					}
 					else if (!sharedState.isLidFree)
 					{
 						notifyLidBlocked()
 					}
 				case "black" =>
-					if (sharedState.isLidFree && sharedState.servoAngle == 0)
+					if (sharedState.isLidFree && sharedState.servoAngle == 90)
 					{
 						println("Ouverture de la poubelle noire")
-						servoMotor.tell(setAngle(90), self)
-						sharedState.servoAngle = 90
+						servoMotor.tell(setAngle(0), self)
+						sharedState.servoAngle = 0
 					}
 					else if (!sharedState.isLidFree)
 					{
 						notifyLidBlocked()
 					}
 				case "green" =>
-					if (sharedState.isLidFree && sharedState.servoAngle == 0)
+					if (sharedState.isLidFree && sharedState.servoAngle == 90)
 					{
 						println("Ouverture de la poubelle verte")
-						servoMotor.tell(setAngle(90), self)
-						sharedState.servoAngle = 90
+						servoMotor.tell(setAngle(0), self)
+						sharedState.servoAngle = 0
 					}
 					else if (!sharedState.isLidFree)
 					{
@@ -172,7 +172,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 
 	private def notifyLidBlocked(): Unit =
 	{
-		val synthesizerUrl = "http://127.0.0.1:8124/synthesize/"
+		val synthesizerUrl = "http://192.168.1.253:8124/synthesize/"
 		val message = "The%20lid%20seems%20to%20be%20blocked%2C%20free%20it%20up%20before%20I%20can%20open%20it."
 		val client = HttpClient.newHttpClient()
 		val request = HttpRequest.newBuilder()

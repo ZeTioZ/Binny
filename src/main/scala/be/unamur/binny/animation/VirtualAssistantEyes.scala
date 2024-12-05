@@ -1,6 +1,6 @@
 package be.unamur.binny.animation
 
-import scalafx.animation.{KeyFrame, ScaleTransition, Timeline, TranslateTransition}
+import scalafx.animation.{KeyFrame, Timeline, TranslateTransition}
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
@@ -8,15 +8,17 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 import scalafx.util.Duration
 
+import be.unamur.binny.SharedState
+
 import scala.util.Random
 
-class VirtualAssistantEyes extends JFXApp3 {
+class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 
 	private val eyeRadius: Float = 70.0   // Taille des yeux
 	private val pupilRadius: Float = 35.0 // Taille des pupilles
-	private val movementRange: Float = 15  // Limite de déplacement des pupilles
+	private val movementRange: Float = eyeRadius - pupilRadius - 5 // Limite de déplacement des pupilles (reste dans l'œil)
 
-	// Création des yeux (les grands cercles blancs)
+	// Création des yeux (grands cercles blancs)
 	private val leftEye: Circle = new Circle {
 		centerX = 150
 		centerY = 160
@@ -35,7 +37,7 @@ class VirtualAssistantEyes extends JFXApp3 {
 		strokeWidth = 2
 	}
 
-	// Création des pupilles (les petits cercles noirs)
+	// Création des pupilles (petits cercles noirs)
 	private val leftPupil: Circle = new Circle {
 		centerX = leftEye.centerX()
 		centerY = leftEye.centerY()
@@ -50,49 +52,77 @@ class VirtualAssistantEyes extends JFXApp3 {
 		fill = Color.Black
 	}
 
-	// Animation qui déplace les pupilles de gauche à droite
-	private val eyeMovementTimeline: Timeline = new Timeline {
+	// Définir les mouvements des pupilles
+	private def movePupils(dx: Double, dy: Double): Unit = {
+		def clamp(value: Double, min: Double, max: Double): Double = {
+			Math.max(min, Math.min(max, value))
+		}
+
+		val newLeftX = clamp(leftPupil.centerX() + dx, leftEye.centerX() - movementRange, leftEye.centerX() + movementRange)
+		val newLeftY = clamp(leftPupil.centerY() + dy, leftEye.centerY() - movementRange, leftEye.centerY() + movementRange)
+
+		val newRightX = clamp(rightPupil.centerX() + dx, rightEye.centerX() - movementRange, rightEye.centerX() + movementRange)
+		val newRightY = clamp(rightPupil.centerY() + dy, rightEye.centerY() - movementRange, rightEye.centerY() + movementRange)
+
+		new TranslateTransition {
+			duration = Duration(500)
+			node = leftPupil
+			toX = newLeftX - leftEye.centerX()
+			toY = newLeftY - leftEye.centerY()
+		}.play()
+
+		new TranslateTransition {
+			duration = Duration(500)
+			node = rightPupil
+			toX = newRightX - rightEye.centerX()
+			toY = newRightY - rightEye.centerY()
+		}.play()
+	}
+
+	// Animation de clignement des yeux (les pupilles disparaissent)
+	private def performBlink(): Unit = {
+		leftPupil.visible = false
+		rightPupil.visible = false
+
+		leftEye.scaleY = 0.1
+		rightEye.scaleY = 0.1
+		rightEye.fill= Color.Black
+		leftEye.fill = Color.Black
+		new Timeline {
+			keyFrames = Seq(
+				KeyFrame(Duration(100), onFinished = _ => {
+					leftEye.scaleY = 1.0
+					rightEye.scaleY = 1.0
+					leftPupil.visible = true
+					rightPupil.visible = true
+					rightEye.fill= Color.White
+					leftEye.fill = Color.White
+				})
+			)
+		}.play()
+	}
+
+	// Sélection aléatoire d'une animation
+	private def playRandomAnimation(): Unit = {
+		Random.nextInt(5) match {
+			case 0 => movePupils(0, -movementRange) // Regard en haut
+			case 1 => movePupils(0, movementRange)  // Regard en bas
+			case 2 => movePupils(-movementRange, 0) // Regard à gauche
+			case 3 => movePupils(movementRange, 0)  // Regard à droite
+			case 4 => performBlink()               // Clignement
+		}
+	}
+
+	// Boucle des animations
+	private val animationLoop: Timeline = new Timeline {
 		cycleCount = Timeline.Indefinite
 		keyFrames = Seq(
-			KeyFrame(Duration(0), onFinished = _ => {
-				leftPupil.centerX = leftEye.centerX() - movementRange
-				rightPupil.centerX = rightEye.centerX() - movementRange
-			}),
-			KeyFrame(Duration(500), onFinished = _ => {
-				leftPupil.centerX = leftEye.centerX() + movementRange
-				rightPupil.centerX = rightEye.centerX() + movementRange
-			}),
-			KeyFrame(Duration(1000), onFinished = _ => {
-				leftPupil.centerX = leftEye.centerX() - movementRange
-				rightPupil.centerX = rightEye.centerX() - movementRange
-			})
+			KeyFrame(Duration(1000), onFinished = _ => playRandomAnimation())
 		)
 	}
 
-	// Animation qui déplace les pupilles de gauche à droite
-	private val leftPupilTransition: TranslateTransition = new TranslateTransition {
-		duration = Duration(1000)
-		node = leftPupil
-		fromX = -movementRange
-		toX = movementRange
-		autoReverse = true
-		cycleCount = TranslateTransition.Indefinite
-	}
-
-	private val rightPupilTransition: TranslateTransition = new TranslateTransition {
-		duration = Duration(1000)
-		node = rightPupil
-		fromX = -movementRange
-		toX = movementRange
-		autoReverse = true
-		cycleCount = TranslateTransition.Indefinite
-	}
-
 	override def start(): Unit = {
-		// Démarrage de l'animation au lancement
-//		eyeMovementTimeline.play() // En mode teleportation
-		leftPupilTransition.play()
-		rightPupilTransition.play()
+		animationLoop.play()
 
 		stage = new PrimaryStage {
 			title = "Virtual Assistant Eyes Animation"

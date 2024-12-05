@@ -75,6 +75,7 @@ async def upload_image(file: Optional[UploadFile] = File(None)):
 			shutil.copyfileobj(file.file, f)
 		predictions = model.predict(f"{uploads_path}{file.filename}")
 		print(predictions[0].names)
+		predictions[0].show()
 		boxes = convert_image_box_outputs(predictions)
 		best_cls = boxes[0].cls if len(boxes) > 0 else "None"
 		best_conf = boxes[0].conf if len(boxes) > 0 else 0
@@ -83,7 +84,7 @@ async def upload_image(file: Optional[UploadFile] = File(None)):
 				best_cls = box.cls
 				best_conf = box.conf
 		os.remove(f"{uploads_path}{file.filename}")
-		if best_conf < 0.5 or best_cls == "None":
+		if best_conf < 0.65 or best_cls == "None":
 			return JSONResponse(content={"message": f"Could not detect any objects in the image!"}, status_code=200)
 		return JSONResponse(content={"message": best_cls}, status_code=200)
 	except FileNotFoundError as error:

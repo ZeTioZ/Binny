@@ -51,7 +51,7 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 			println("Démarrage du moteur")
 			try
 			{
-				self ! setAngle(0)
+				self ! setAngle(90)
 			}
 			catch
 			{
@@ -67,7 +67,7 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 				servo.setTargetPosition(angle)
 				servo.setEngaged(true)
 				self ! ServoUpdate(angle)
-				scheduleDisengage()
+//				scheduleDisengage()
 			}
 			catch
 			{

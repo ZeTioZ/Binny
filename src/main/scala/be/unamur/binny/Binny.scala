@@ -22,6 +22,6 @@ object Binny extends JFXApp3
 	val webSocket: Unit = new WebSocket(phidgetHub).start()
 
 	override def start(): Unit = {
-		new VirtualAssistantEyes().start()
+		new VirtualAssistantEyes(sharedState).start()
 	}
 }
