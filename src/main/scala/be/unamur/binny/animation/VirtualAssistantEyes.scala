@@ -5,7 +5,7 @@ import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.paint.Color
-import scalafx.scene.shape.Circle
+import scalafx.scene.shape.{Circle, Rectangle}
 import scalafx.util.Duration
 
 import be.unamur.binny.SharedState
@@ -50,6 +50,39 @@ class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 		centerY = rightEye.centerY()
 		radius = pupilRadius
 		fill = Color.Black
+	}
+
+	//Background pour la progressbar
+	private val progressBarBackground: Rectangle = new Rectangle {
+		x = 100
+		y = 260
+		width = 280
+		height = 20
+		fill = Color.Gray
+		arcWidth = 10
+		arcHeight = 10
+	}
+
+	//ProgressBar Dynamique
+	private val progressBar: Rectangle = new Rectangle {
+		x = 100
+		y = 260
+		width = 0
+		height = 20
+		fill = Color.Green
+		arcWidth = 10
+		arcHeight = 10
+	}
+
+	//Animation pour la progressbar
+	private val progressBarUpdater: Timeline = new Timeline{
+		cycleCount = Timeline.Indefinite
+		keyFrames = Seq(
+			KeyFrame(Duration(100), onFinished = _ =>{
+				val progress = sharedState.lidDistance / 564.0
+				progressBar.width = progress * progressBarBackground.width()
+			})
+		)
 	}
 
 	// Définir les mouvements des pupilles
@@ -127,7 +160,7 @@ class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 		stage = new PrimaryStage {
 			title = "Virtual Assistant Eyes Animation"
 			scene = new Scene(480, 320) {
-				content = List(leftEye, rightEye, leftPupil, rightPupil)
+				content = List(leftEye, rightEye, leftPupil, rightPupil, progressBarBackground, progressBar)
 				fill = Color.LightBlue
 				cursor = scalafx.scene.Cursor.None
 			}
