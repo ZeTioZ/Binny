@@ -79,7 +79,7 @@ class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 		cycleCount = Timeline.Indefinite
 		keyFrames = Seq(
 			KeyFrame(Duration(100), onFinished = _ =>{
-				val progress = sharedState.lidDistance / 564.0
+				val progress = (564.0 - sharedState.lidDistance) / 564.0
 				progressBar.width = progress * progressBarBackground.width()
 			})
 		)
@@ -156,6 +156,7 @@ class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 
 	override def start(): Unit = {
 		animationLoop.play()
+		progressBarUpdater.play()
 
 		stage = new PrimaryStage {
 			title = "Virtual Assistant Eyes Animation"
