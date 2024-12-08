@@ -77,10 +77,21 @@ class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 	//Animation pour la progressbar
 	private val progressBarUpdater: Timeline = new Timeline{
 		cycleCount = Timeline.Indefinite
+		var open = false
 		keyFrames = Seq(
-			KeyFrame(Duration(100), onFinished = _ =>{
-				val progress = (564.0 - sharedState.lidDistance) / 564.0
-				progressBar.width = progress * progressBarBackground.width()
+			KeyFrame(Duration(100), onFinished = _ => {
+				if (sharedState.servoAngle == 90)
+				{
+					if (open) {
+						open = false
+						Thread.sleep(1000)
+					}
+					val progress = (564.0 - sharedState.lidDistance) / 564.0
+					progressBar.width = progress * progressBarBackground.width()
+				}
+				else {
+					open = true
+				}
 			})
 		)
 	}
