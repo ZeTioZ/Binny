@@ -88,7 +88,7 @@ async def stt_to_tts():
 					if keyword_found:
 						print("Keyword detected. Listening for command...")
 						requests.get(url=f"{rest_api_url}/stop_sound")
-						if current_task is not None:
+						if current_task is not None and type(current_task) is threading.Thread:
 							current_task.join()
 							current_task = None
 						current_task = await fetch_synthesizer_response(f"{synthesizer_url}/Hey%2C%20what%20can%20I%20do%20for%20you%3F")

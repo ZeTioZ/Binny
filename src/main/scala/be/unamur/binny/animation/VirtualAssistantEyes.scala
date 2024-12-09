@@ -4,6 +4,7 @@ import scalafx.animation.{KeyFrame, Timeline, TranslateTransition}
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
+import scalafx.scene.SceneIncludes.jfxScene2sfx
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Circle, Rectangle}
 import scalafx.util.Duration
@@ -177,6 +178,16 @@ class VirtualAssistantEyes(sharedState: SharedState) extends JFXApp3 {
 				cursor = scalafx.scene.Cursor.None
 			}
 			fullScreen = true
+		}
+	}
+
+	def setBackgroundColor(color: String): Unit = {
+		color.toLowerCase match {
+			case "blue" => stage.scene().fill = Color.Blue
+			case "black" => stage.scene().fill = Color.Black
+			case "green" => stage.scene().fill = Color.Green
+			case "default" => stage.scene().fill = Color.LightBlue
+			case _ => println(s"Unknown color: $color")
 		}
 	}
 }

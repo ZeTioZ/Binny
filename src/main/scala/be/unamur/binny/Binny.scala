@@ -17,11 +17,12 @@ object Binny extends JFXApp3
 	private val system: ActorSystem = ActorSystem("IoTSystem")
 	private val hub: Hub = new Hub()
 	private val servo: RCServo = new RCServo()
+	private val virtualAssistantEyes: VirtualAssistantEyes = new VirtualAssistantEyes(sharedState);
 	private val servoMotor: ActorRef = system.actorOf(Props(new ServoMotor(sharedState, servo)), "servoMotor")
-	private val phidgetHub: ActorRef = system.actorOf(Props(new PhidgetHub(sharedState, hub, servoMotor)), "phidgetHub")
+	private val phidgetHub: ActorRef = system.actorOf(Props(new PhidgetHub(sharedState, hub, servoMotor, virtualAssistantEyes)), "phidgetHub")
 	val webSocket: Unit = new WebSocket(phidgetHub).start()
 
 	override def start(): Unit = {
-		new VirtualAssistantEyes(sharedState).start()
+		virtualAssistantEyes.start()
 	}
 }

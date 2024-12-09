@@ -2,6 +2,7 @@ package be.unamur.binny.actors
 
 import akka.actor.{Actor, ActorRef, Props}
 import be.unamur.binny.SharedState
+import be.unamur.binny.animation.VirtualAssistantEyes
 import com.phidget22.{Hub, PhidgetException}
 
 import java.net.URI
@@ -13,7 +14,7 @@ private case class TouchedUpdate(touched: Boolean)
 private case class LidFreeUpdate(lid: Boolean)
 private case class NearUpdate(near: Boolean)
 
-class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) extends Actor
+class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef, virtualAssistantEyes: VirtualAssistantEyes) extends Actor
 {
 	override def preStart(): Unit =
 	{
@@ -78,6 +79,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 				else if (sharedState.isLidFree && sharedState.servoAngle == 0)
 				{
 					servoMotor.tell(setAngle(90), self)
+					virtualAssistantEyes.setBackgroundColor("default")
 					sharedState.servoAngle = 90
 				}
 				else if (!sharedState.isLidFree)
@@ -106,6 +108,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 				else if (sharedState.isLidFree && sharedState.servoAngle == 0)
 				{
 					servoMotor.tell(setAngle(90), self)
+					virtualAssistantEyes.setBackgroundColor("default")
 					sharedState.servoAngle = 90
 				}
 				else if (!sharedState.isLidFree)
@@ -131,6 +134,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 					if (sharedState.isLidFree && sharedState.servoAngle == 90)
 					{
 						println("Ouverture de la poubelle bleue")
+						virtualAssistantEyes.setBackgroundColor("blue")
 						servoMotor.tell(setAngle(0), self)
 						sharedState.servoAngle = 0
 					}
@@ -142,6 +146,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 					if (sharedState.isLidFree && sharedState.servoAngle == 90)
 					{
 						println("Ouverture de la poubelle noire")
+						virtualAssistantEyes.setBackgroundColor("black")
 						servoMotor.tell(setAngle(0), self)
 						sharedState.servoAngle = 0
 					}
@@ -153,6 +158,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 					if (sharedState.isLidFree && sharedState.servoAngle == 90)
 					{
 						println("Ouverture de la poubelle verte")
+						virtualAssistantEyes.setBackgroundColor("green")
 						servoMotor.tell(setAngle(0), self)
 						sharedState.servoAngle = 0
 					}
@@ -172,7 +178,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef) exten
 
 	private def notifyLidBlocked(): Unit =
 	{
-		val synthesizerUrl = "http://192.168.1.253:8124/synthesize/"
+		val synthesizerUrl = "http://127.0.0.1:8124/synthesize/"
 		val message = "The%20lid%20seems%20to%20be%20blocked%2C%20free%20it%20up%20before%20I%20can%20open%20it."
 		val client = HttpClient.newHttpClient()
 		val request = HttpRequest.newBuilder()
