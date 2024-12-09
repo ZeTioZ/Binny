@@ -25,7 +25,7 @@ def send_request(message, hand_context=None):
 	payload = {
 		"model": "llama-3.2-3b-instruct-uncensored-i1",
 		"messages": [
-			{ "role": "system", "content": f"You are a trash bin named \"Binny\" that always try to be funny and kid friendly. Don't correct the user if he mispronounce your name. The user can ask where to place trash you will have to answer according to these rules: plastic, metal and drink carton into the blue bag, food scraps in green bag, miscellaneous into black bag and styrofoam, cardboard or glass in none of these bags. Always answer with the phonetics so that a TTS machine can pronounce every word correctly. Always add at the end of the message a little reminder of which bag you reminded the user to use with the following format \"bag:bag_color\", replace bag_color with the color of the bag you've give to the user. It's extremely important to add that reminder in that format! Never send a message that respond to a trash color without that reminder in that format! For this session, the user is showing you {hand_context}." },
+			{ "role": "system", "content": f"You are a trash bin named \"Binny\" that always try to be funny and kid friendly. Don't correct the user if he mispronounce your name. The user can ask where to place trash you will have to answer according to these rules: plastic, metal and drink carton into the blue bag, food scraps in green bag, miscellaneous (which can contain paper, packagings, tissues) into black bag and styrofoam, cardboard or glass in none of these bags. Always add at the end of the message a little reminder of which bag you reminded the user to use with the following format \"bag:bag_color\", replace bag_color with the color of the bag you've give to the user. It's extremely important to add that reminder in that format! Never send a message that respond to a trash color without that reminder in that format! For this session, the user is showing you {hand_context}." },
 			{ "role": "user", "content": message }
 		],
 		"temperature": 0.7,
@@ -36,11 +36,14 @@ def send_request(message, hand_context=None):
 	headers = {
 		"Content-Type": "application/json"
 	}
-	response = requests.post(llm_url, headers=headers, data=json.dumps(payload))
-	if response.status_code == 200:
-		return response.json()
-	else:
-		return {"error": "Request failed with status code " + str(response.status_code)}
+	try:
+		response = requests.post(llm_url, headers=headers, data=json.dumps(payload))
+		if response.status_code == 200:
+			return response.json()
+		else:
+			return {"error": "Request failed with status code " + str(response.status_code)}
+	except Exception as e:
+		return {"Error while sending request to the LLM model": str(e)}
 
 
 async def fetch_synthesizer_response(url):
@@ -51,7 +54,7 @@ async def fetch_synthesizer_response(url):
 def process_command(user_input, hand_context=None):
 	print("Processing command...")
 	response = send_request(user_input, hand_context)
-	bot_response = response.get("choices")[0].get("message").get("content") if response.get("choices") else "Sorry, I did not understand what you said."
+	bot_response = response.get("choices")[0].get("message").get("content") if response.get("choices") else "Sorry, it seems that there is an issue with my brain. Please try again later."
 	sanitize = bot_response.replace("\n", " ").replace("\r", "").replace("\t", "").replace("\\", "")
 	bag_pattern = re.compile(r"(bag: *(?:blue|green|black|none))", re.IGNORECASE)
 	sanitize = re.sub(r"\*([^*]+)\*", '', sanitize, flags=re.IGNORECASE)
@@ -59,14 +62,14 @@ def process_command(user_input, hand_context=None):
 	sanitize = re.sub(bag_pattern, '', sanitize)
 	bag_color = colors[0].replace(" ", "").replace("bag:", "") if len(colors) > 0 else "None"
 	asyncio.run(websocket.send_ws_message(f"{websocket_url}", f'color:{bag_color.lower()}'))
-	print(sanitize)
+	print("Sanitized bot response: ", sanitize)
 	response = asyncio.run(fetch_synthesizer_response(f"{synthesizer_url}/{sanitize}"))
-	print(response)
+	print("Synthesizer response: ", response)
 
 
 async def stt_to_tts():
 	global current_task
-	keyword_variants = ["hey", "ok", "hey bunny", "hey binny", "hey benny", "hey beanies", "hey ben", "hey benn", "hey beanie", "ebony", "hey baby", "baby", "hey binnie", "hey bin", "hey binn"]
+	keyword_variants = ["hey", "minnie", "bunny", "binny", "benny", "beanies", "ben", "benn", "beanie", "ebony", "baby", "binnie", "bin", "binn"]
 	recognizer = sr.Recognizer()
 	try:
 		with sr.Microphone() as source2:
@@ -77,7 +80,12 @@ async def stt_to_tts():
 					audio2 = recognizer.listen(source2)
 					user_input = recognizer.recognize_google(audio2)
 					print(user_input)
-					if user_input.lower() in keyword_variants:
+					keyword_found = False
+					for keyword in keyword_variants:
+						if keyword in user_input.lower():
+							keyword_found = True
+							break
+					if keyword_found:
 						print("Keyword detected. Listening for command...")
 						requests.get(url=f"{rest_api_url}/stop_sound")
 						if current_task is not None:
