@@ -8,11 +8,8 @@ import websocket
 import threading
 import cv2
 import os
-import time
+import subprocess
 
-cap = cv2.VideoCapture(0)
-if cap.isOpened():
-	cap.read()
 llm_url = "http://127.0.0.1:1234/v1/chat/completions"
 synthesizer_url = "http://127.0.0.1:8124/synthesize"
 rest_api_url = "http://127.0.0.1:8000"
@@ -25,7 +22,7 @@ def send_request(message, hand_context=None):
 	payload = {
 		"model": "llama-3.2-3b-instruct-uncensored-i1",
 		"messages": [
-			{ "role": "system", "content": f"You are a trash bin named \"Binny\" that always try to be funny and kid friendly. Don't correct the user if he mispronounce your name. The user can ask where to place trash you will have to answer according to these rules: plastic, metal and drink carton into the blue bag, food scraps in green bag, miscellaneous (which can contain paper, packagings, tissues) into black bag and styrofoam, cardboard or glass in none of these bags. It's extremely important to add that reminder in that format! Never send a message that respond to a trash color without that reminder in that format! For this session, the user is showing you {hand_context}." },
+			{ "role": "system", "content": f"You are a trash bin named \"Binny\" that always try to be funny and kid friendly. Don't correct the user if he mispronounce your name. The user can ask where to place trash you will have to answer according to these rules: plastic, metal and drink carton into the blue bin, food scraps in green bin, miscellaneous (which can contain paper, packagings, tissues) into black bin and styrofoam, cardboard or glass in none of these bins. The user can also ask you to open the different colored bins. Just answer that you can open the colored bin he wants and give that color as for the bin color chosen. For this session, the user is showing you {hand_context}." },
 			{ "role": "user", "content": message }
 		],
 		"temperature": 0.7,
@@ -87,56 +84,74 @@ def process_command(user_input, hand_context=None):
 
 async def stt_to_tts():
 	global current_task
-	keyword_variants = ["hey", "minnie", "bunny", "binny", "benny", "beanies", "ben", "benn", "beanie", "ebony", "baby", "binnie", "bin", "binn"]
+	keyword_variants = ["albany", "minnie", "bunny", "binny", "benny", "beanies", "ben", "benn", "beanie", "ebony", "baby", "binnie", "bin", "binn", "been"]
 	recognizer = sr.Recognizer()
 	try:
-		with sr.Microphone() as source2:
-			recognizer.adjust_for_ambient_noise(source2, duration=0.5)
+		with sr.Microphone() as source:
+			recognizer.adjust_for_ambient_noise(source, duration=4)
 			while True:
 				try:
 					print("Listening for keyword...")
-					audio2 = recognizer.listen(source2)
-					user_input = recognizer.recognize_google(audio2)
+					audio1 = recognizer.listen(source)
+					user_input = recognizer.recognize_google(audio1, language="en-US")
 					print(user_input)
 					keyword_found = False
 					for keyword in keyword_variants:
 						if keyword in user_input.lower():
 							keyword_found = True
 							break
-					if keyword_found:
-						print("Keyword detected. Listening for command...")
-						requests.get(url=f"{rest_api_url}/stop_sound")
-						if current_task is not None and type(current_task) is threading.Thread:
-							current_task.join()
-							current_task = None
-						current_task = await fetch_synthesizer_response(f"{synthesizer_url}/Hey%2C%20what%20can%20I%20do%20for%20you%3F")
-						ret, frame = cap.read() if cap.isOpened() else (False, None)
-						image_response = await post_image(frame) if frame is not None else None
-						hand_context = image_response.json().get('message') if image_response is not None else None
-						hand_context = hand_context if hand_context is not None and hand_context in ['e-waste', 'general_waste', 'glass', 'metal', 'organic_waste', 'paper', 'plastic'] else None
-						if hand_context in ['e-waste', 'general_waste', 'glass', 'metal', 'organic_waste', 'paper', 'plastic']:
-							user_input = f"As you can see, I have a {image_response.json().get('message')} object to throw away. Where should I put it?"
-						else:
-							time.sleep(2)
-							audio2 = recognizer.listen(source2)
-							user_input = recognizer.recognize_google(audio2)
-						print(user_input)
-						current_task = threading.Thread(target=process_command, args=(user_input, hand_context,))
-						current_task.start()
 				except sr.RequestError as e:
 					print("Could not request results; {0}".format(e))
 				except sr.UnknownValueError as e:
 					print("Unknown error occurred {0}".format(e))
 				except Exception as e:
 					print("An error occurred: ", e)
+				if keyword_found:
+					requests.get(url=f"{rest_api_url}/stop_sound")
+					print("Keyword detected.")
+					if current_task is not None and type(current_task) is threading.Thread:
+						current_task.join()
+						current_task = None
+					await fetch_synthesizer_response(f"{synthesizer_url}/Hey%2C%20what%20can%20I%20do%20for%20you%3F")
+					image_response = await post_image()
+					hand_context = image_response.json().get('message') if image_response is not None else None
+					hand_context = hand_context if hand_context is not None and hand_context in ['e-waste', 'general_waste', 'glass', 'metal', 'organic_waste', 'paper', 'plastic'] else None
+					if hand_context in ['e-waste', 'general_waste', 'glass', 'metal', 'organic_waste', 'paper', 'plastic']:
+						print(f"Hand context recognized: {hand_context}")
+						user_input = f"As you can see, I have a {image_response.json().get('message')} object to throw away. Where should I put it?"
+					else:
+						while True:
+							try:
+								print("Hand context not recognized. Going back to listening for a command...")
+								recognizer.adjust_for_ambient_noise(source, duration=4)
+								recognizer.adjust_for_ambient_noise(source, duration=0.5)
+								audio2 = recognizer.listen(source)
+								user_input = recognizer.recognize_google(audio2, language="en-US")
+								break
+							except sr.RequestError as e:
+								print("Could not request results; {0}".format(e))
+							except sr.UnknownValueError as e:
+								print("Unknown error occurred {0}".format(e))
+							except Exception as e:
+								print("An error occurred: ", e)
+					if user_input is not None:
+						print(user_input)
+						current_task = threading.Thread(target=process_command, args=(user_input, hand_context,))
+						current_task.start()
 	except sr.RequestError as e:
 		print("Could not request results; {0}".format(e))
 	except sr.UnknownValueError as e:
 		print("Unknown error occurred {0}".format(e))
 
 
-async def post_image(image_file):
-	cv2.imwrite('image.jpg', image_file)
+async def post_image():
+	if os.name == 'nt':
+		cap = cv2.VideoCapture(0)
+		ret, frame = cap.read() if cap.isOpened() else (False, None)
+		cap.release()
+		cv2.imwrite('image.jpg', frame)
+	else:
+		subprocess.check_call('fswebcam --device /dev/video0 image.jpg', shell=True)
 	url = f'{rest_api_url}/upload_image'
 	with open('image.jpg', 'rb') as file:
 		resp = requests.post(url=url, files={'file': file})
