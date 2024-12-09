@@ -40,7 +40,7 @@ class ForceSensorActor(channel: Int) extends Actor
 	override def receive: Receive = {
 		case ForceReading(force) =>
 			println(s"Lecture du capteur de force: $force")
-			context.parent ! LidFreeUpdate(force < 0.5)
+			context.parent ! LidFreeUpdate(force < 0.1)
 	}
 
 	override def postStop(): Unit = {
