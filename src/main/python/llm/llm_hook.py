@@ -25,11 +25,30 @@ def send_request(message, hand_context=None):
 	payload = {
 		"model": "llama-3.2-3b-instruct-uncensored-i1",
 		"messages": [
-			{ "role": "system", "content": f"You are a trash bin named \"Binny\" that always try to be funny and kid friendly. Don't correct the user if he mispronounce your name. The user can ask where to place trash you will have to answer according to these rules: plastic, metal and drink carton into the blue bag, food scraps in green bag, miscellaneous (which can contain paper, packagings, tissues) into black bag and styrofoam, cardboard or glass in none of these bags. Always add at the end of the message a little reminder of which bag you reminded the user to use with the following format \"bag:bag_color\", replace bag_color with the color of the bag you've give to the user. It's extremely important to add that reminder in that format! Never send a message that respond to a trash color without that reminder in that format! For this session, the user is showing you {hand_context}." },
+			{ "role": "system", "content": f"You are a trash bin named \"Binny\" that always try to be funny and kid friendly. Don't correct the user if he mispronounce your name. The user can ask where to place trash you will have to answer according to these rules: plastic, metal and drink carton into the blue bag, food scraps in green bag, miscellaneous (which can contain paper, packagings, tissues) into black bag and styrofoam, cardboard or glass in none of these bags. It's extremely important to add that reminder in that format! Never send a message that respond to a trash color without that reminder in that format! For this session, the user is showing you {hand_context}." },
 			{ "role": "user", "content": message }
 		],
 		"temperature": 0.7,
 		"max_tokens": -1,
+		"response_format": {
+			"type": "json_schema",
+			"json_schema": {
+				"name": "binny_response",
+				"strict": "true",
+				"schema": {
+					"type": "object",
+					"properties": {
+						"message": {
+							"type": "string"
+						},
+						"bin_color": {
+							"type": "string"
+						}
+					},
+					"required": ["message", "bin_color"]
+				}
+			}
+		},
 		"stream": False
 	}
 
@@ -55,16 +74,15 @@ def process_command(user_input, hand_context=None):
 	print("Processing command...")
 	response = send_request(user_input, hand_context)
 	bot_response = response.get("choices")[0].get("message").get("content") if response.get("choices") else "Sorry, it seems that there is an issue with my brain. Please try again later."
-	sanitize = bot_response.replace("\n", " ").replace("\r", "").replace("\t", "").replace("\\", "")
-	bag_pattern = re.compile(r"(bag: *(?:blue|green|black|none))", re.IGNORECASE)
+	json_structured_response = json.loads(bot_response)
+	sanitize = json_structured_response["message"].replace("\n", " ").replace("\r", "").replace("\t", "").replace("\\", "")
 	sanitize = re.sub(r"\*([^*]+)\*", '', sanitize, flags=re.IGNORECASE)
-	colors = re.findall(bag_pattern, sanitize)
-	sanitize = re.sub(bag_pattern, '', sanitize)
-	bag_color = colors[0].replace(" ", "").replace("bag:", "") if len(colors) > 0 else "None"
+	bag_color = json_structured_response["bin_color"]
 	asyncio.run(websocket.send_ws_message(f"{websocket_url}", f'color:{bag_color.lower()}'))
-	print("Sanitized bot response: ", sanitize)
+	print("Color:", bag_color)
+	print("Sanitized bot response:", sanitize)
 	response = asyncio.run(fetch_synthesizer_response(f"{synthesizer_url}/{sanitize}"))
-	print("Synthesizer response: ", response)
+	print("Synthesizer response:", response)
 
 
 async def stt_to_tts():
