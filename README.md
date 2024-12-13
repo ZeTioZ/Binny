@@ -99,6 +99,7 @@ Binny is a work in progress, with several potential enhancements:
 - **Diego Alarcon**
 - **Matteo Devigne**
 - **Arthur Barbieux**
+- **Rodrigue Yando Djamen**
 
 ## License
 
