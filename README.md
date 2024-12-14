@@ -30,9 +30,10 @@ Developed as part of the courses **INFOM450**, **INFOM451**, and **INFOM453** at
   - Animation features using ScalaFX for a child-friendly interface.
   - WebSocket for interaction between Python AI and Scala components.
 - **Python** for AI and voice interaction:
-  - Image recognition using [**YOLOv11**](https://docs.ultralytics.com/models/yolo11/).
+  - Waste recognition using [**YOLOv11**](https://docs.ultralytics.com/models/yolo11/).
+  - Wake word detection with [**OpenWakeWord**](https://github.com/dscripka/openWakeWord)
   - Natural Language Processing with [**Llama 3.2**](https://www.llama.com/).
-  - Voice synthesis using GLaDOS-inspired text-to-speech models.
+  - Text-to-speech conversion with [**GLaDOS**](https://github.com/R2D2FISH/glados-tts)
 
 ### Hardware
 - **Raspberry Pi 4**: Central processing unit.
@@ -87,11 +88,18 @@ You may need to adjust the ip addresses in the python files to match your local 
 ## Possible Improvements
 
 Binny is a work in progress, with several potential enhancements:
-- Adding keyword activation for voice interaction.
 - Improving object recognition accuracy with additional AI training.
 - Optimizing hardware for faster response times.
 - Introducing mobile app integration for bin management.
-- Upgrading the visual interface with a larger touchscreen display.
+- Upgrading the visual interface with a faster and larger touchscreen display.
+- Implementing a more robust voice interaction system with better natural language processing.
+- Adding a reward system for children to encourage recycling.
+- Incorporating a cloud-based data storage system for waste statistics and user feedback.
+- Enhancing the educational content with more recycling tips and fun facts.
+- Adding an automatic closing mechanism for the lid.
+- Adding a battery backup system for uninterrupted operation.
+- Adding a remote control system for bin operation.
+- Adding buttons for manual operation.
 
 ## Contributors
 
