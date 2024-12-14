@@ -20,7 +20,8 @@ class WebSocket(hub: ActorRef) extends Thread
 	private def messageHandler: Flow[Message, Message, Any] =
 		Flow[Message].map {
 			case textMessage: TextMessage.Strict =>
-				textMessage.text match {
+				textMessage.text match
+				{
 					case "Hello" =>
 						TextMessage.Strict("Hello, World!")
 					case "color:blue" =>
@@ -44,15 +45,17 @@ class WebSocket(hub: ActorRef) extends Thread
 
 	// Définir la route WebSocket
 	private val route: Route =
-		path("ws") {
+		path("ws")
+		{
 			handleWebSocketMessages(messageHandler)
 		}
 
 	override def run(): Unit = {
 		// Démarrer le serveur HTTP
-		val bindingFuture: Future[ServerBinding] = Http().newServerAt("0.0.0.0", 25000).bind(route)
+		val uri: String = "0.0.0.0"
+		val bindingFuture: Future[ServerBinding] = Http().newServerAt(uri, 25000).bind(route)
 
-		println("Serveur WebSocket démarré sur ws://0.0.0.0:25000/ws")
+		println(s"Serveur WebSocket démarré sur ws://${uri}:25000/ws")
 		println("Appuyez sur ENTER pour arrêter le serveur...")
 
 		StdIn.readLine() // Attendre une entrée pour arrêter le serveur
