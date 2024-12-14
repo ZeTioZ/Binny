@@ -67,7 +67,7 @@ class ServoMotor(sharedState: SharedState, servo: RCServo) extends Actor
 				servo.setTargetPosition(angle)
 				servo.setEngaged(true)
 				self ! ServoUpdate(angle)
-//				scheduleDisengage()
+//				scheduleDisengage() // Le moteur n'est pas désengagé pour le moment, car il ne tient pas le couvercle si on le désengage...
 			}
 			catch
 			{

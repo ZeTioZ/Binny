@@ -9,7 +9,8 @@ class TouchSensorActor(channel: Int) extends Actor
 	private val touchSensor = new VoltageRatioInput()
 	private var touched: Double = 0.0
 
-	override def preStart(): Unit = {
+	override def preStart(): Unit =
+	{
 		println("Démarrage du capteur de toucher...")
 		try
 		{
@@ -20,7 +21,8 @@ class TouchSensorActor(channel: Int) extends Actor
 			touchSensor.setSensorType(VoltageRatioSensorType.PN_1129)
 			println("Capteur de toucher connecté")
 
-			touchSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
+			touchSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) =>
+			{
 				if (event.getSensorValue != touched)
 					touched = event.getSensorValue
 					self ! TouchReading(touched)
@@ -35,14 +37,16 @@ class TouchSensorActor(channel: Int) extends Actor
 		}
 	}
 
-	override def receive: Receive = {
+	override def receive: Receive =
+	{
 		case TouchReading(touched) =>
 			val isTouched = touched > 0.5
 			context.parent ! TouchedUpdate(isTouched)
 			println(s"Touched: $isTouched")
 	}
 
-	override def postStop(): Unit = {
+	override def postStop(): Unit =
+	{
 		println("Capteur de toucher déconnecté")
 		touchSensor.close()
 	}

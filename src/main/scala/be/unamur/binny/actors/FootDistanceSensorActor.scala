@@ -9,7 +9,8 @@ class FootDistanceSensorActor(channel: Int) extends Actor
 	private val irReading = new VoltageRatioInput()
 	private var distance: Double = 0.0
 
-	override def preStart(): Unit = {
+	override def preStart(): Unit =
+	{
 		println("Démarrage du capteur de touché...")
 		try
 		{
@@ -20,7 +21,8 @@ class FootDistanceSensorActor(channel: Int) extends Actor
 			irReading.setSensorType(VoltageRatioSensorType.PN_1103)
 			println("Capteur infrarouge connecté")
 
-			irReading.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
+			irReading.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) =>
+			{
 				if (event.getSensorValue != distance)
 					distance = event.getSensorValue
 					self ! IRReading(distance)
@@ -35,7 +37,8 @@ class FootDistanceSensorActor(channel: Int) extends Actor
 		}
 	}
 
-	override def receive: Receive = {
+	override def receive: Receive =
+	{
 		case IRReading(distance) =>
 			val isNear = distance > 0.5
 			println(s"Is Near: $isNear")
@@ -43,7 +46,8 @@ class FootDistanceSensorActor(channel: Int) extends Actor
 
 	}
 
-	override def postStop(): Unit = {
+	override def postStop(): Unit =
+	{
 		println("Capteur infrarouge déconnecté")
 		irReading.close()
 	}

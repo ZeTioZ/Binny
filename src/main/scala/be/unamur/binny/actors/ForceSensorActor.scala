@@ -9,7 +9,8 @@ class ForceSensorActor(channel: Int) extends Actor
 	private val forceSensor = new VoltageRatioInput()
 	private var force: Double = 0.0
 
-	override def preStart(): Unit = {
+	override def preStart(): Unit =
+	{
 		println("Démarrage du capteur de force...")
 		try
 		{
@@ -20,7 +21,8 @@ class ForceSensorActor(channel: Int) extends Actor
 			forceSensor.setSensorType(VoltageRatioSensorType.PN_1106)
 			println("Capteur de force connecté")
 
-			forceSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) => {
+			forceSensor.addSensorChangeListener((event: VoltageRatioInputSensorChangeEvent) =>
+			{
 				if (event.getSensorValue != force && Math.abs(event.getSensorValue - force) > 0.01)
 				{
 					force = event.getSensorValue
@@ -37,13 +39,15 @@ class ForceSensorActor(channel: Int) extends Actor
 		}
 	}
 
-	override def receive: Receive = {
+	override def receive: Receive =
+	{
 		case ForceReading(force) =>
 			println(s"Lecture du capteur de force: $force")
 			context.parent ! LidFreeUpdate(force < 0.1)
 	}
 
-	override def postStop(): Unit = {
+	override def postStop(): Unit =
+	{
 		println("Capteur de force déconnecté")
 		forceSensor.close()
 	}
