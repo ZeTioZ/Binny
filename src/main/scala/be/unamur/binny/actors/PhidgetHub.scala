@@ -56,7 +56,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef, virtu
 			sharedState.lidDistance = distance
 			if (distance < 300 && sharedState.servoAngle == 0)
 			{
-				resetLidCloseScheduler()
+				scheduleLidClose()
 			}
 		case TouchedUpdate(touched) =>
 			sharedState.isTouched = touched
@@ -110,6 +110,7 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef, virtu
 			servoMotor.tell(setAngle(90), self)
 			virtualAssistantEyes.setBackgroundColor("default")
 			sharedState.servoAngle = 90
+			cancelLidCloseScheduler()
 		}
 		else if (!sharedState.isLidFree)
 		{
@@ -188,12 +189,12 @@ class PhidgetHub(sharedState: SharedState, hub: Hub, servoMotor: ActorRef, virtu
 	private def scheduleLidClose(): Unit =
 	{
 		import context.dispatcher
+		cancelLidCloseScheduler()
 		lidCloseScheduler = Some(context.system.scheduler.scheduleOnce(5.seconds, self, "lidClose"))
 	}
 
-	private def resetLidCloseScheduler(): Unit =
+	private def cancelLidCloseScheduler(): Unit =
 	{
 		lidCloseScheduler.foreach(_.cancel())
-		scheduleLidClose()
 	}
 }
