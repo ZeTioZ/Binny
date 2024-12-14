@@ -21,7 +21,7 @@ class LidDistanceSensorActor(channel: Int) extends Actor
 			lidDistanceSensor.addDistanceChangeListener((event: DistanceSensorDistanceChangeEvent) =>
 			{
 				val distance: Double = event.getDistance
-				if (distance != lastDistance && Math.abs(distance - lastDistance) > 2.5)
+				if (distance != lastDistance && Math.abs(distance - lastDistance) > 5)
 				{
 					lastDistance = distance
 					self ! LidDistanceReading(distance)
