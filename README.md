@@ -96,7 +96,6 @@ Binny is a work in progress, with several potential enhancements:
 - Adding a reward system for children to encourage recycling.
 - Incorporating a cloud-based data storage system for waste statistics and user feedback.
 - Enhancing the educational content with more recycling tips and fun facts.
-- Adding an automatic closing mechanism for the lid.
 - Adding a battery backup system for uninterrupted operation.
 - Adding a remote control system for bin operation.
 - Adding buttons for manual operation.
