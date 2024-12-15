@@ -5,7 +5,7 @@ import threading
 
 class PlaySound:
 	def __init__(self):
-		self.audio = None
+		self.audio = pyaudio.PyAudio()
 		self.stream = None
 		self.thread = None
 		self.wf = None
@@ -15,7 +15,6 @@ class PlaySound:
 		self.thread.start()
 
 	def _play(self, sound_path: str):
-		self.audio = pyaudio.PyAudio()
 		self.wf = wave.open(rf"{sound_path}", 'rb')
 
 		# define callback
@@ -38,14 +37,6 @@ class PlaySound:
 	def stop_sound(self) -> bool:
 		if self.stream is not None:
 			self.stream.stop_stream()
-			self.stream.close()
-			self.stream = None
-		if self.wf is not None:
-			self.wf.close()
-			self.wf = None
-		if self.audio is not None:
-			self.audio.terminate()
-			self.audio = None
 		return True
 
 	def stop(self):
