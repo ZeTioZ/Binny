@@ -74,8 +74,6 @@ async def upload_image(file: Optional[UploadFile] = File(None)):
 		with open(f"{uploads_path}{file.filename}", 'wb') as f:
 			shutil.copyfileobj(file.file, f)
 		predictions = model.predict(f"{uploads_path}{file.filename}")
-		print(predictions[0].names)
-		predictions[0].show()
 		boxes = convert_image_box_outputs(predictions)
 		best_cls = boxes[0].cls if len(boxes) > 0 else "None"
 		best_conf = boxes[0].conf if len(boxes) > 0 else 0
