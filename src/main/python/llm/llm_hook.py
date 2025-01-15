@@ -16,8 +16,8 @@ from wakeword.wakeword import Wakeword
 
 llm_url = "http://127.0.0.1:1234/v1/chat/completions"
 synthesizer_url = "http://127.0.0.1:8124/synthesize"
-rest_api_url = "http://127.0.0.1:8000"
-websocket_url = "127.0.0.1:25000"
+rest_api_url = "http://10.8.0.10:8000"
+websocket_url = "10.8.0.10:25000"
 current_task = None
 
 
